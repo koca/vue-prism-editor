@@ -4,14 +4,7 @@ module.exports = {
     [
       "prismjs",
       {
-        languages: [
-          "javascript",
-          "css",
-          "markup",
-          "typescript",
-          "python",
-          "markdown"
-        ],
+        languages: ["javascript", "css", "markup", "typescript", "markdown"],
         plugins: [""],
         theme: "tomorrow",
         css: true

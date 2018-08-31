@@ -32,5 +32,7 @@ export default {
 .editor {
   height: 100vh;
   padding: 10px 0;
+  font-family: monospace;
+  font-size: 20px;
 }
 </style>

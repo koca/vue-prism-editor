@@ -1,15 +1,15 @@
 <template>
-  <div class="editor-wrapper">
-    <div class="content-wrapper">
-      <div class="line-numbers-wrapper" v-if="showLineNumbers">
-        <code class="line-numbers">
+  <div class="prism-editor-wrapper">
+    <div class="prism-editor__content-wrapper">
+      <div class="prism-editor__line-numbers-wrapper" v-if="showLineNumbers">
+        <code class="prism-editor__line-numbers">
           <span v-for="line in lineNumbers" :key="line">{{line}}</span>
         </code>
       </div>
-      <div :class="{['language-'+language]: true}" class="prism-code-wrapper">
+      <div :class="{['language-'+language]: true}" class="prism-editor__code-wrapper">
         <pre
-          class="prism-code"
-          ref="txt"
+          class="prism-editor__code"
+          ref="pre"
           v-html="content"
           :contenteditable="readOnly"
           @keydown="handleKeyDown"
@@ -60,7 +60,6 @@ export default {
       undoOffset: 0,
       undoTimestamp: 0,
       lastPos: 0,
-      html: "",
       codeData: ""
     };
   },
@@ -87,11 +86,10 @@ export default {
   },
   updated() {
     if (this.selection) {
-      selectionRange(this.$refs.txt, this.selection);
+      selectionRange(this.$refs.pre, this.selection);
     }
   },
   mounted() {
-    this.html = prism(this.codeData, this.language);
     this.recordChange(this.getPlain());
 
     this.undoTimestamp = 0; // Reset timestamp
@@ -120,15 +118,15 @@ export default {
         this.$emit("click", evt);
       }
       this.undoTimestamp = 0; // Reset timestamp
-      this.selection = selectionRange(this.$refs.txt);
+      this.selection = selectionRange(this.$refs.pre);
     },
 
     getPlain() {
-      if (this._innerHTML === this.$refs.txt.innerHTML) {
+      if (this._innerHTML === this.$refs.pre.innerHTML) {
         return this._plain;
       }
-      const plain = htmlToPlain(normalizeHtml(this.$refs.txt.innerHTML));
-      this._innerHTML = this.$refs.txt.innerHTML;
+      const plain = htmlToPlain(normalizeHtml(this.$refs.pre.innerHTML));
+      this._innerHTML = this.$refs.pre.innerHTML;
       this._plain = plain;
 
       return this._plain;
@@ -203,13 +201,13 @@ export default {
       } else if (evt.keyCode === 8) {
         // Backspace Key
         const { start: cursorPos, end: cursorEndPos } = selectionRange(
-          this.$refs.txt
+          this.$refs.pre
         );
         if (cursorPos !== cursorEndPos) {
           return; // Bail on selections
         }
 
-        const deindent = getDeindentLevel(this.$refs.txt.innerText, cursorPos);
+        const deindent = getDeindentLevel(this.$refs.pre.innerText, cursorPos);
         if (deindent <= 0) {
           return; // Bail when deindent level defaults to 0
         }
@@ -222,8 +220,8 @@ export default {
         evt.preventDefault();
       } else if (evt.keyCode === 13) {
         // Enter Key
-        const { start: cursorPos } = selectionRange(this.$refs.txt);
-        const indentation = getIndent(this.$refs.txt.innerText, cursorPos);
+        const { start: cursorPos } = selectionRange(this.$refs.pre);
+        const indentation = getIndent(this.$refs.pre.innerText, cursorPos);
         document.execCommand("insertHTML", false, "\n" + indentation);
         evt.preventDefault();
       } else if (
@@ -259,7 +257,7 @@ export default {
         this.undoTimestamp = 0;
       }
 
-      this.selection = selectionRange(this.$refs.txt);
+      this.selection = selectionRange(this.$refs.pre);
 
       if (
         evt.keyCode !== 37 && // left
@@ -281,14 +279,13 @@ export default {
 
 
 <style>
-.editor-wrapper pre,
-.editor-wrapper code {
-  font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, Courier,
-    monospace !important;
+.prism-editor-wrapper pre,
+.prism-editor-wrapper code {
+  font-family: inherit;
   font-size: 12px;
   line-height: 20px !important;
 }
-.editor-wrapper {
+.prism-editor-wrapper {
   display: flex;
   height: 100%;
   width: 100%;
@@ -298,26 +295,26 @@ export default {
   tab-size: 1.5em;
   -moz-tab-size: 1.5em;
 }
-.content-wrapper {
+.prism-editor__content-wrapper {
   overflow: auto;
   display: flex;
   height: 100%;
   width: 100%;
 }
-pre.prism-code {
+pre.prism-editor__code {
   background: #292929;
   white-space: pre-wrap;
   word-break: break-word;
   margin: 0;
   padding: 0;
 }
-pre.prism-code:focus {
+pre.prism-editor__code:focus {
   outline: none;
 }
-.prism-code-wrapper {
+.prism-editor__code-wrapper {
   flex: 1;
 }
-.line-numbers {
+.prism-editor__line-numbers {
   white-space: pre;
   display: flex;
   flex-direction: column;
@@ -325,7 +322,7 @@ pre.prism-code:focus {
   margin-right: 1.5em;
   text-align: right;
 }
-.line-numbers > span {
+.prism-editor__line-numbers > span {
   width: 50px;
 }
 </style>

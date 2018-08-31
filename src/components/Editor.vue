@@ -1,25 +1,20 @@
 <template>
   <div class="prism-editor-wrapper">
-    <div class="prism-editor__content-wrapper">
-      <div class="prism-editor__line-numbers-wrapper" v-if="showLineNumbers">
-        <code class="prism-editor__line-numbers">
-          <span v-for="line in lineNumbers" :key="line">{{line}}</span>
-        </code>
-      </div>
-      <div :class="{['language-'+language]: true}" class="prism-editor__code-wrapper">
-        <pre
-          class="prism-editor__code"
-          ref="pre"
-          v-html="content"
-          :contenteditable="readOnly"
-          @keydown="handleKeyDown"
-          @keyup="handleKeyUp"
-          @click="handleClick"
-          spellCheck="false"
-          >
-          </pre>
-        </div>
+    <div class="prism-editor__line-numbers" aria-hidden="true" v-if="lineNumbers">
+      <div class="prism-editor__line-width-calc" style="height: 0px; visibility: hidden; pointer-events: none;">999</div>
+      <div class="prism-editor__line-number" v-for="line in lineNumbersCount" :key="line">{{line}}</div>
     </div>
+    <pre
+      class="prism-editor__code"
+      :class="{['language-'+language]: true}"
+      ref="pre"
+      v-html="content"
+      :contenteditable="readOnly"
+      @keydown="handleKeyDown"
+      @keyup="handleKeyUp"
+      @click="handleClick"
+      spellCheck="false"
+      ></pre>
   </div>
 </template>
 
@@ -30,6 +25,7 @@ import normalizeHtml from "../utils/normalizeHtml.js";
 import htmlToPlain from "../utils/htmlToPlain.js";
 import selectionRange from "../utils/selection-range.js";
 import { getIndent, getDeindentLevel } from "../utils/getIndent";
+
 export default {
   props: {
     emitEvents: {
@@ -40,7 +36,7 @@ export default {
       type: String,
       default: "js"
     },
-    showLineNumbers: {
+    lineNumbers: {
       type: Boolean,
       default: true
     },
@@ -57,6 +53,7 @@ export default {
     return {
       undoStack: [],
       selection: undefined,
+      lineNumbersHeight: "20px",
       undoOffset: 0,
       undoTimestamp: 0,
       lastPos: 0,
@@ -69,15 +66,23 @@ export default {
       handler(newVal) {
         this.codeData = newVal;
       }
+    },
+    content: {
+      immediate: true,
+      handler() {
+        this.$nextTick(() => {
+          this.lineNumbersHeight = getComputedStyle(this.$refs.pre).height;
+        });
+      }
     }
   },
   computed: {
     content() {
       return prism(this.codeData, this.language);
     },
-    lineNumbers() {
+    lineNumbersCount() {
       let totalLines = this.codeData.split(/\r\n|\n/).length;
-      // ignore last line break (os spesific etc.)
+      // TOOO: Find a better way of doing this - ignore last line break (os spesific etc.)
       if (this.codeData.endsWith("\n")) {
         totalLines--;
       }
@@ -94,7 +99,7 @@ export default {
 
     this.undoTimestamp = 0; // Reset timestamp
 
-    const stopPasting = e => {
+    const onPaste = e => {
       e.preventDefault();
       // get text representation of clipboard
       var text = e.clipboardData.getData("Text");
@@ -103,13 +108,12 @@ export default {
       document.execCommand("insertHTML", false, escapeHtml(text));
 
       this.codeData = this.getPlain();
+      this.recordChange(this.codeData);
     };
 
     document
       .querySelector("pre[contenteditable]")
-      .addEventListener("paste", stopPasting);
-
-    ///
+      .addEventListener("paste", onPaste);
   },
 
   methods: {
@@ -223,6 +227,7 @@ export default {
         const { start: cursorPos } = selectionRange(this.$refs.pre);
         const indentation = getIndent(this.$refs.pre.innerText, cursorPos);
         document.execCommand("insertHTML", false, "\n" + indentation);
+
         evt.preventDefault();
       } else if (
         // Undo / Redo
@@ -282,47 +287,51 @@ export default {
 .prism-editor-wrapper pre,
 .prism-editor-wrapper code {
   font-family: inherit;
-  font-size: 12px;
-  line-height: 20px !important;
+  line-height: inherit;
 }
 .prism-editor-wrapper {
-  display: flex;
-  height: 100%;
+  position: absolute;
   width: 100%;
-  background: #292929;
-  color: #ffffff;
+  height: 100%;
+  display: flex;
+  align-items: flex-start;
+
   overflow: auto;
   tab-size: 1.5em;
   -moz-tab-size: 1.5em;
+  font-family: monospace;
 }
-.prism-editor__content-wrapper {
-  overflow: auto;
-  display: flex;
+.prism-editor__line-numbers {
+  left: 0px;
+  box-sizing: border-box;
   height: 100%;
-  width: 100%;
+  overflow: hidden;
+  flex-shrink: 0;
+  /*min-height: 3347px; */
+  padding-top: 4px;
 }
+.prism-editor__line-number {
+  color: #999;
+  box-sizing: border-box;
+  padding: 0 3px 0 5px;
+  min-width: 20px;
+  text-align: right;
+  white-space: nowrap;
+}
+
 pre.prism-editor__code {
-  background: #292929;
-  white-space: pre-wrap;
-  word-break: break-word;
-  margin: 0;
-  padding: 0;
+  margin: 0px;
+  flex-grow: 2;
+  min-height: 100%;
+  box-sizing: border-box;
+  line-height: inherit;
+  font-family: inherit;
+  padding: 4px 2px 4px 4px;
+  tab-size: 4;
+  -moz-tab-size: 4;
+  outline: none;
 }
 pre.prism-editor__code:focus {
   outline: none;
-}
-.prism-editor__code-wrapper {
-  flex: 1;
-}
-.prism-editor__line-numbers {
-  white-space: pre;
-  display: flex;
-  flex-direction: column;
-  color: #727680;
-  margin-right: 1.5em;
-  text-align: right;
-}
-.prism-editor__line-numbers > span {
-  width: 50px;
 }
 </style>

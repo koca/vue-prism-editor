@@ -22,6 +22,7 @@
     "@vue/cli-service": "^3.0.0-beta.15",
     "@vue/eslint-config-prettier": "^3.0.0-beta.15",
     "babel-plugin-prismjs": "^1.0.2",
+    "tailwindcss": "^0.6.5",
     "vue-template-compiler": "^2.5.16"
   },
   "browserslist": [

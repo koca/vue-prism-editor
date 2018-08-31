@@ -5,6 +5,7 @@
 </template>
 
 <script>
+import "prismjs";
 import Editor from "./components/Editor.vue";
 
 export default {
@@ -19,18 +20,4 @@ export default {
 </script>
 
 <style>
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-}
-#app {
-  min-height: 100vh;
-  font-family: "Avenir", Helvetica, Arial, sans-serif;
-  background: #333;
-}
-.editor {
-  height: 100vh;
-  padding: 10px 0;
-}
 </style>

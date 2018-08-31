@@ -1,4 +1,4 @@
-import prism from "prismjs";
+/* global Prism */
 import escapeHtml from "escape-html";
 
 function wrap(code, lang) {
@@ -26,8 +26,8 @@ export default (str, lang) => {
   if (lang === "py") {
     lang = "python";
   }
-  if (prism.languages[lang]) {
-    const code = prism.highlight(str, prism.languages[lang], lang);
+  if (Prism.languages[lang]) {
+    const code = Prism.highlight(str, Prism.languages[lang], lang);
     return wrap(code, rawLang);
   }
   return wrap(str, "text");

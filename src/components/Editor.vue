@@ -260,7 +260,11 @@ export default {
         // Enter Key
         const { start: cursorPos } = selectionRange(this.$refs.pre);
         const indentation = getIndent(this.$refs.pre.innerText, cursorPos);
-        document.execCommand("insertHTML", false, "\n" + indentation);
+
+        // https://stackoverflow.com/questions/35585421
+        // add a space and remove it. it works :/
+        document.execCommand("insertHTML", false, "\n " + indentation);
+        document.execCommand("delete", false);
 
         evt.preventDefault();
       } else if (

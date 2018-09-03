@@ -106,15 +106,18 @@ export default {
     }
     const onPaste = e => {
       e.preventDefault();
+      const currentCursorPos = selectionRange(this.$refs.pre);
 
       // get text representation of clipboard
       var text = (e.originalEvent || e).clipboardData.getData("Text");
-
       // insert text manually
       document.execCommand("insertHTML", false, escapeHtml(text));
 
+      const newCursorPos = currentCursorPos.end + text.length;
+      this.selection = { start: newCursorPos, end: newCursorPos };
+
       this.codeData = this.getPlain();
-      this.recordChange(this.codeData);
+      this.recordChange(this.codeData, this.selection);
     };
     const $pre = this.$refs.pre;
     $pre.addEventListener("paste", onPaste);

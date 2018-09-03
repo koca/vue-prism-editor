@@ -1,8 +1,8 @@
 <template>
   <div class="prism-editor-wrapper">
-    <div class="prism-editor__line-numbers" aria-hidden="true" v-if="lineNumbers">
+    <div class="prism-editor__line-numbers" aria-hidden="true" v-if="lineNumbers" :style="{'min-height': lineNumbersHeight}">
       <div class="prism-editor__line-width-calc" style="height: 0px; visibility: hidden; pointer-events: none;">999</div>
-      <div class="prism-editor__line-number" v-for="line in lineNumbersCount" :key="line">{{line}}</div>
+      <div class="prism-editor__line-number token comment" v-for="line in lineNumbersCount" :key="line">{{line}}</div>
     </div>
     <pre
       class="prism-editor__code"
@@ -37,6 +37,10 @@ export default {
       default: "js"
     },
     lineNumbers: {
+      type: Boolean,
+      default: true
+    },
+    autoStyleLineNumbers: {
       type: Boolean,
       default: true
     },
@@ -96,13 +100,15 @@ export default {
   },
   mounted() {
     this.recordChange(this.getPlain());
-
     this.undoTimestamp = 0; // Reset timestamp
-
+    if (this.lineNumbers && this.autoStyleLineNumbers) {
+      this.styleLineNumbers();
+    }
     const onPaste = e => {
       e.preventDefault();
+
       // get text representation of clipboard
-      var text = e.clipboardData.getData("Text");
+      var text = (e.originalEvent || e).clipboardData.getData("Text");
 
       // insert text manually
       document.execCommand("insertHTML", false, escapeHtml(text));
@@ -110,13 +116,42 @@ export default {
       this.codeData = this.getPlain();
       this.recordChange(this.codeData);
     };
-
-    document
-      .querySelector("pre[contenteditable]")
-      .addEventListener("paste", onPaste);
+    const $pre = this.$refs.pre;
+    $pre.addEventListener("paste", onPaste);
+    this.$once("hook:beforeDestroy", () => {
+      $pre.removeEventListener("paste", onPaste);
+    });
   },
 
   methods: {
+    styleLineNumbers() {
+      const $editor = this.$refs.pre;
+      const $lineNumbers = this.$el.querySelector(
+        ".prism-editor__line-numbers"
+      );
+      const editorStyles = window.getComputedStyle($editor);
+
+      this.$nextTick(() => {
+        const btlr = "border-top-left-radius";
+        const bblr = "border-bottom-left-radius";
+        $lineNumbers.style[btlr] = editorStyles[btlr];
+        $lineNumbers.style[bblr] = editorStyles[bblr];
+        $editor.style[btlr] = 0;
+        $editor.style[bblr] = 0;
+
+        const stylesList = [
+          "background-color",
+          "margin-top",
+          "padding-top",
+          "font-family",
+          "font-size",
+          "line-height"
+        ];
+        stylesList.forEach(style => {
+          $lineNumbers.style[style] = editorStyles[style];
+        });
+      }, 0);
+    },
     handleClick(evt) {
       if (this.emitEvents) {
         this.$emit("click", evt);
@@ -124,7 +159,6 @@ export default {
       this.undoTimestamp = 0; // Reset timestamp
       this.selection = selectionRange(this.$refs.pre);
     },
-
     getPlain() {
       if (this._innerHTML === this.$refs.pre.innerHTML) {
         return this._plain;

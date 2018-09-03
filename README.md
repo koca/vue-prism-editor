@@ -12,9 +12,10 @@ what if prismjs was an editor?
 - Copy / Paste
 - The spaces/tabs of the previous line is preserved when a new line is added
 - Works on mobile (thanks to contenteditable)
-- Resize to parent width and height <sup style="color:red">new</sup>
+- Resize to parent width and height <sup>new</sup>
 - Support for line numbers <sup style="color:red">new</sup>
-- Support for autosizing the editor <sup style="color:red">new</sup>
+- Support for autosizing the editor <sup>new</sup>
+- Autostyling the linenumbers(optional) <sup>new</sup>
 
 ## Use Case
 

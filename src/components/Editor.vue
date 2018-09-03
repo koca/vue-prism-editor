@@ -1,6 +1,6 @@
 <template>
   <div class="prism-editor-wrapper">
-    <div class="prism-editor__line-numbers" aria-hidden="true" v-if="lineNumbers">
+    <div class="prism-editor__line-numbers" aria-hidden="true" v-if="lineNumbers" :style="{'min-height': lineNumbersHeight}">
       <div class="prism-editor__line-width-calc" style="height: 0px; visibility: hidden; pointer-events: none;">999</div>
       <div class="prism-editor__line-number" v-for="line in lineNumbersCount" :key="line">{{line}}</div>
     </div>
@@ -226,7 +226,11 @@ export default {
         // Enter Key
         const { start: cursorPos } = selectionRange(this.$refs.pre);
         const indentation = getIndent(this.$refs.pre.innerText, cursorPos);
-        document.execCommand("insertHTML", false, "\n" + indentation);
+
+        // https://stackoverflow.com/questions/35585421
+        // add a space and remove it. it works :/
+        document.execCommand("insertHTML", false, "\n " + indentation);
+        document.execCommand("delete", false);
 
         evt.preventDefault();
       } else if (

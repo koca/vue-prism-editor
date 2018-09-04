@@ -1,19 +1,39 @@
 {
-  "name": "prism-editor",
-  "version": "0.1.0",
-  "private": true,
+  "name": "vue-prism-editor",
+  "version": "0.0.1",
+  "description": "A dead simple code editor with syntax highlighting and line numbers.",
+  "keywords": [
+    "vue",
+    "editor",
+    "code editor",
+    "prism"
+  ],
+  "main": "dist/VuePrismEditor.umd.js",
+  "module": "dist/VuePrismEditor.common.js",
+  "unpkg": "dist/VuePrismEditor.umd.min.js",
   "scripts": {
     "serve": "vue-cli-service serve",
-    "build": "vue-cli-service build",
+    "build": "vue-cli-service build --dest site",
+    "build:lib": "vue-cli-service build --target lib --name VuePrismEditor ./src/components/Editor.vue && rimraf dist/demo.html",
     "lint": "vue-cli-service lint"
   },
+  "author": {
+    "name": "Mesut Koca",
+    "email": "imesutkoca@gmail.com"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/koca/vue-prism-editor.git"
+  },
+  "bugs": {
+    "url": "https://github.com/koca/vue-prism-editor/issues"
+  },
+  "homepage": "https://github.com/koca/vue-prism-editor#readme",
+  "license": "MIT",
   "dependencies": {
     "dom-iterator": "^1.0.0",
     "escape-html": "^1.0.3",
-    "prismjs": "^1.14.0",
-    "register-service-worker": "^1.0.0",
-    "unescape": "^1.0.1",
-    "vue": "^2.5.16"
+    "unescape": "^1.0.1"
   },
   "devDependencies": {
     "@vue/cli-plugin-babel": "^3.0.0-beta.15",
@@ -21,8 +41,11 @@
     "@vue/cli-plugin-pwa": "^3.0.0-beta.15",
     "@vue/cli-service": "^3.0.0-beta.15",
     "@vue/eslint-config-prettier": "^3.0.0-beta.15",
-    "babel-plugin-prismjs": "^1.0.2",
+    "prismjs": "^1.15.0",
+    "register-service-worker": "^1.5.2",
+    "rimraf": "^2.6.2",
     "tailwindcss": "^0.6.5",
+    "vue": "^2.5.17",
     "vue-template-compiler": "^2.5.16"
   },
   "browserslist": [

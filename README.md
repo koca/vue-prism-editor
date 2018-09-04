@@ -1,8 +1,10 @@
-# Vue Prism Editor - experimental
+# Vue Prism Editor
 
-what if prismjs was an editor?
+> A dead simple code editor with syntax highlighting and line numbers. 7kb/gz
 
-> live demo: [prism-editor.netlify.com](https://prism-editor.netlify.com/)
+## Demo
+
+[prism-editor.netlify.com](https://prism-editor.netlify.com/)
 
 ## Features
 
@@ -13,7 +15,7 @@ what if prismjs was an editor?
 - The spaces/tabs of the previous line is preserved when a new line is added
 - Works on mobile (thanks to contenteditable)
 - Resize to parent width and height <sup>new</sup>
-- Support for line numbers <sup style="color:red">new</sup>
+- Support for line numbers <sup>new</sup>
 - Support for autosizing the editor <sup>new</sup>
 - Autostyling the linenumbers(optional) <sup>new</sup>
 
@@ -21,13 +23,66 @@ what if prismjs was an editor?
 
 The goal of this project is to have a simple code editor. You can use to make small changes of some content or you just need a textarea with syntax highlighting. That's what it's good for. If you need an advanced code editor use Codemirror or Monaco Editor.
 
-## Usage
-
-TODO
+## Install
 
 ```sh
-npm install __TODO__
+npm install vue-prism-editor
 ```
+
+or
+
+```sh
+yarn add vue-prism-editor
+```
+
+## Usage
+
+Register the component locally and use it (recommended)
+
+```html
+<template>
+  <prism-editor :code="code" language="js"></prism-editor>
+</template>
+
+<script>
+import PrismEditor from 'vue-prism-editor'
+export default {
+  components: {
+    PrismEditor
+  }
+}
+</script>
+```
+
+Or register the component globally in `main.js`
+
+```js
+import VuePrismEditor from "vue-prism-editor";
+import "vue-prism-editor/dist/vuePrismEditor.css"; // import the styles
+Vue.component("prism-editor", VuePrismEditor);
+```
+
+Browser usage:
+
+```html
+<!-- vue-prism-editor JavaScript -->
+<script src="https://unpkg.com/vue-prism-editor"></script>
+
+<!-- vue-prism-editor CSS -->
+<link rel="stylesheet" href="https://unpkg.com/vue-prism-editor/dist/vuePrismEditor.css">
+
+<!-- use -->
+<script>
+Vue.component('vue-prism-editor', VuePrismEditor)
+new Vue({
+    el: '#app'
+})
+</script>
+```
+
+## Options
+
+_todo_
 
 ## Dependencies
 

@@ -14,6 +14,10 @@
       @keyup="handleKeyUp"
       @click="handleClick"
       spellCheck="false"
+      autocapitalize="off"
+      autocomplete="off"
+      autocorrect="off"
+      data-gramm="false"
       ></pre>
   </div>
 </template>
@@ -74,10 +78,18 @@ export default {
     content: {
       immediate: true,
       handler() {
-        this.$nextTick(() => {
-          this.lineNumbersHeight = getComputedStyle(this.$refs.pre).height;
-        });
+        if (this.lineNumbers) {
+          this.$nextTick(() => {
+            this.setLineNumbersHeight();
+          });
+        }
       }
+    },
+    lineNumbers() {
+      this.$nextTick(() => {
+        this.styleLineNumbers();
+        this.setLineNumbersHeight();
+      });
     }
   },
   computed: {
@@ -101,9 +113,8 @@ export default {
   mounted() {
     this.recordChange(this.getPlain());
     this.undoTimestamp = 0; // Reset timestamp
-    if (this.lineNumbers && this.autoStyleLineNumbers) {
-      this.styleLineNumbers();
-    }
+    this.styleLineNumbers();
+
     const onPaste = e => {
       e.preventDefault();
       const currentCursorPos = selectionRange(this.$refs.pre);
@@ -118,6 +129,7 @@ export default {
 
       this.codeData = this.getPlain();
       this.recordChange(this.codeData, this.selection);
+      this.setLineNumbersHeight();
     };
     const $pre = this.$refs.pre;
     $pre.addEventListener("paste", onPaste);
@@ -127,7 +139,12 @@ export default {
   },
 
   methods: {
+    setLineNumbersHeight() {
+      this.lineNumbersHeight = getComputedStyle(this.$refs.pre).height;
+    },
     styleLineNumbers() {
+      if (!this.lineNumbers || !this.autoStyleLineNumbers) return;
+
       const $editor = this.$refs.pre;
       const $lineNumbers = this.$el.querySelector(
         ".prism-editor__line-numbers"
@@ -153,6 +170,7 @@ export default {
         stylesList.forEach(style => {
           $lineNumbers.style[style] = editorStyles[style];
         });
+        $lineNumbers.style["margin-bottom"] = "-" + editorStyles["padding-top"];
       }, 0);
     },
     handleClick(evt) {
@@ -325,49 +343,40 @@ export default {
 
 
 <style>
-.prism-editor-wrapper pre,
 .prism-editor-wrapper code {
   font-family: inherit;
   line-height: inherit;
 }
 .prism-editor-wrapper {
-  position: absolute;
+  /* position: absolute; */
   width: 100%;
   height: 100%;
   display: flex;
   align-items: flex-start;
-
   overflow: auto;
   tab-size: 1.5em;
   -moz-tab-size: 1.5em;
-  font-family: monospace;
 }
 .prism-editor__line-numbers {
-  left: 0px;
-  box-sizing: border-box;
   height: 100%;
   overflow: hidden;
   flex-shrink: 0;
-  /*min-height: 3347px; */
   padding-top: 4px;
+  margin-top: 0;
 }
 .prism-editor__line-number {
-  color: #999;
-  box-sizing: border-box;
-  padding: 0 3px 0 5px;
-  min-width: 20px;
+  /* padding: 0 3px 0 5px; */
   text-align: right;
   white-space: nowrap;
 }
 
-pre.prism-editor__code {
-  margin: 0px;
+.prism-editor__code {
+  margin-top: 0 !important;
+  margin-bottom: 0 !important;
   flex-grow: 2;
   min-height: 100%;
   box-sizing: border-box;
-  line-height: inherit;
-  font-family: inherit;
-  padding: 4px 2px 4px 4px;
+  /* padding: 4px 2px 4px 8px; */
   tab-size: 4;
   -moz-tab-size: 4;
   outline: none;

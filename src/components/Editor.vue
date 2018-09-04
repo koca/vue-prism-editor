@@ -170,6 +170,7 @@ export default {
         stylesList.forEach(style => {
           $lineNumbers.style[style] = editorStyles[style];
         });
+        $lineNumbers.style["margin-bottom"] = "-" + editorStyles["padding-top"];
       }, 0);
     },
     handleClick(evt) {

@@ -6,6 +6,11 @@
 
 [prism-editor.netlify.com](https://prism-editor.netlify.com/)
 
+## Examples
+  
+ * Codesandbox: [https://codesandbox.io/s/61yrlnlnmn](https://codesandbox.io/s/61yrlnlnmn)
+ * Codepen: [https://codepen.io/koca/pen/QVgqyR](https://codepen.io/koca/pen/QVgqyR)
+
 ## Features
 
 - Code Editing ^^

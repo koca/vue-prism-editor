@@ -101,11 +101,6 @@ OR:
 
 _todo_
 
-## Dependencies
-
-- [prismjs](https://ghub.io/prismjs): Lightweight, robust, elegant syntax highlighting. A spin-off project from Dabblet.
-- [vue](https://ghub.io/vue): Reactive, component-oriented view layer for modern web interfaces.
-
 ## Thanks
 
 inspired by [react-live](https://github.com/FormidableLabs/react-live).

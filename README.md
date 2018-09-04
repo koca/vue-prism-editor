@@ -80,6 +80,23 @@ new Vue({
 </script>
 ```
 
+## Prismjs
+
+This package won't install prismjs if you use prismjs already skip this step if not you need to load Prism somewhere in your app:
+
+```js
+// yarn add prismjs
+import "prismjs";
+import "prismjs/themes/prism.css";
+```
+
+OR:
+
+```html
+<link rel="stylesheet" href="https://unpkg.com/prismjs/themes/prism.css" />
+<script src="https://unpkg.com/prismjs"></script>
+```
+
 ## Options
 
 _todo_

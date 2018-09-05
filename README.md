@@ -87,7 +87,7 @@ new Vue({
 
 ## Prismjs
 
-This package won't install prismjs if you use prismjs already skip this step if not you need to load Prism somewhere in your app:
+This package won't install Prismjs. If you use Prismjs already skip this step. If not you need to load Prismjs somewhere in your app:
 
 ```js
 // yarn add prismjs
@@ -110,7 +110,7 @@ OR:
 | language             | `String`  | `"js"`  | `vue,html,md,ts` + Prismjs Languages | language of the code                                  |
 | lineNumbers          | `Boolean` | `false` | -                                    | Whether to show line numbers or not                   |
 | readonly             | `Boolean` | `false` | -                                    | Indicates if the editor is read only or not.          |
-| emitEvents           | `Boolean` | `false` | -                                    | Indicates if the should emit events.                  |
+| emitEvents           | `Boolean` | `false` | -                                    | Indicates if the editor should emit events.                  |
 | autoStyleLineNumbers | `Boolean` | `true`  | -                                    | Allow the line number to be styled by this component. |
 
 ## Events

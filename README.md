@@ -6,6 +6,11 @@
 
 [prism-editor.netlify.com](https://prism-editor.netlify.com/)
 
+## Examples
+  
+ * Codesandbox: [https://codesandbox.io/s/61yrlnlnmn](https://codesandbox.io/s/61yrlnlnmn)
+ * Codepen: [https://codepen.io/koca/pen/QVgqyR](https://codepen.io/koca/pen/QVgqyR)
+
 ## Features
 
 - Code Editing ^^
@@ -118,11 +123,6 @@ Those events won't fire unless you set the `emitEvents` prop to `true`.
 | keydown      | `(event)`  | This event is emitted when a keydown event happens in editor                |
 | keyup        | `(event)`  | This event is emitted when a keyup event happens in editor                  |
 | editor-click | `(event)`  | This event is emitted  when clicking anywhere in the contenteditable editor |
-
-## Dependencies
-
-- [prismjs](https://ghub.io/prismjs): Lightweight, robust, elegant syntax highlighting. A spin-off project from Dabblet.
-- [vue](https://ghub.io/vue): Reactive, component-oriented view layer for modern web interfaces.
 
 ## Thanks
 

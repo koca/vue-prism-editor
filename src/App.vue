@@ -50,7 +50,7 @@ export default {
     readonly: false,
     /* eslint-disable */
     code: `<template>
-  <div id="app-6">
+  <div id="app">
     <p>{{ message }}</p>
     <input v-model="message">
   </div>
@@ -63,8 +63,8 @@ export default {
 }
 <\/script>
 <style>
-body {
-  font-size: 21px;
+#app {
+  color: #2ecc71
 }
 </style>` /* eslint-enable */
   }),

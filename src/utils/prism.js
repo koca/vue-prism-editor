@@ -23,9 +23,6 @@ export default (str, lang) => {
   if (lang === "ts") {
     lang = "typescript";
   }
-  if (lang === "py") {
-    lang = "python";
-  }
   if (Prism.languages[lang]) {
     const code = Prism.highlight(str, Prism.languages[lang], lang);
     return wrap(code, rawLang);

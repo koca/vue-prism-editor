@@ -9,7 +9,7 @@
       :class="{['language-'+language]: true}"
       ref="pre"
       v-html="content"
-      :contenteditable="readOnly"
+      :contenteditable="!readonly"
       @keydown="handleKeyDown"
       @keyup="handleKeyUp"
       @click="handleClick"
@@ -42,15 +42,15 @@ export default {
     },
     lineNumbers: {
       type: Boolean,
-      default: true
+      default: false
     },
     autoStyleLineNumbers: {
       type: Boolean,
       default: true
     },
-    readOnly: {
+    readonly: {
       type: Boolean,
-      default: true
+      default: false
     },
     code: {
       type: String,
@@ -98,7 +98,7 @@ export default {
     },
     lineNumbersCount() {
       let totalLines = this.codeData.split(/\r\n|\n/).length;
-      // TOOO: Find a better way of doing this - ignore last line break (os spesific etc.)
+      // TODO: Find a better way of doing this - ignore last line break (os spesific etc.)
       if (this.codeData.endsWith("\n")) {
         totalLines--;
       }
@@ -171,11 +171,11 @@ export default {
           $lineNumbers.style[style] = editorStyles[style];
         });
         $lineNumbers.style["margin-bottom"] = "-" + editorStyles["padding-top"];
-      }, 0);
+      });
     },
     handleClick(evt) {
       if (this.emitEvents) {
-        this.$emit("click", evt);
+        this.$emit("editorClick", evt);
       }
       this.undoTimestamp = 0; // Reset timestamp
       this.selection = selectionRange(this.$refs.pre);

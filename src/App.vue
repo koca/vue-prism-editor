@@ -27,7 +27,7 @@
         language="html"
         :code="code"
         :line-numbers="lineNumbers"
-        :read-only="!readonly"
+        :readonly="readonly"
         ></Editor>
     </main>
   </div>

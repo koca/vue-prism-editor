@@ -63,7 +63,7 @@ Or register the component globally in `main.js`
 
 ```js
 import VuePrismEditor from "vue-prism-editor";
-import "vue-prism-editor/dist/vuePrismEditor.css"; // import the styles
+import "vue-prism-editor/dist/VuePrismEditor.css"; // import the styles
 Vue.component("prism-editor", VuePrismEditor);
 ```
 
@@ -74,7 +74,7 @@ Browser usage:
 <script src="https://unpkg.com/vue-prism-editor"></script>
 
 <!-- vue-prism-editor CSS -->
-<link rel="stylesheet" href="https://unpkg.com/vue-prism-editor/dist/vuePrismEditor.css">
+<link rel="stylesheet" href="https://unpkg.com/vue-prism-editor/dist/VuePrismEditor.css">
 
 <!-- use -->
 <script>

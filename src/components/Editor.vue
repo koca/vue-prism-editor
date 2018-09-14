@@ -131,8 +131,9 @@ export default {
       const newCursorPos = currentCursorPos.end + text.length;
       this.selection = { start: newCursorPos, end: newCursorPos };
 
-      this.codeData = this.getPlain();
-      this.recordChange(this.codeData, this.selection);
+      const plain = this.getPlain();
+      this.recordChange(plain, this.selection);
+      this.updateContent(plain);
       this.setLineNumbersHeight();
     };
     const $pre = this.$refs.pre;
@@ -221,9 +222,6 @@ export default {
       this.undoTimestamp = timestamp;
     },
     updateContent(plain) {
-      this.$nextTick(() => {
-        this.codeData = plain;
-      });
       this.$emit("change", plain);
     },
     restoreStackState(offset) {

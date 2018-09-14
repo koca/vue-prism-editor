@@ -1,4 +1,3 @@
-import Vue from "vue";
 import { mount } from "@vue/test-utils";
 import Editor from "@/components/Editor.vue";
 import "prismjs";
@@ -16,20 +15,17 @@ describe("Editor.vue", () => {
   });
   it("sets contentEditable", () => {
     const wrapper = mount(Editor);
-    expect(
-      wrapper.find(".prism-editor__code").attributes().contenteditable
-    ).toBe("true");
+    const $pre = wrapper.find("pre");
+    expect($pre.attributes().contenteditable).toBe("true");
     wrapper.setProps({
       readonly: true
     });
-    expect(
-      wrapper.find(".prism-editor__code").attributes().contenteditable
-    ).toBe("false");
+    expect($pre.attributes().contenteditable).toBe("false");
   });
   it("emits change event", () => {
     const code = "console.log('test')";
     const wrapper = mount(Editor);
-    const $pre = wrapper.find(".prism-editor__code");
+    const $pre = wrapper.find("pre");
     $pre.element.innerHTML = code;
     $pre.trigger("keyup");
     expect(wrapper.emitted("change")[0]).toEqual([code]);
@@ -66,7 +62,7 @@ describe("Editor.vue", () => {
         keydown: mockHandler
       }
     });
-    const $pre = wrapper.find(".prism-editor__code");
+    const $pre = wrapper.find("pre");
     $pre.element.innerHTML = code;
     $pre.trigger("keydown");
     expect(wrapper.emitted()["keydown"]).toBeTruthy();
@@ -84,7 +80,7 @@ describe("Editor.vue", () => {
         keyup: mockHandler
       }
     });
-    const $pre = wrapper.find(".prism-editor__code");
+    const $pre = wrapper.find("pre");
     $pre.element.innerHTML = code;
     $pre.trigger("keyup");
     expect(wrapper.emitted()["keyup"]).toBeTruthy();

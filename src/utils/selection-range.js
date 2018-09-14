@@ -22,6 +22,7 @@ function position(el, pos) {
 
   var setSelection = pos.end && pos.end !== pos.start;
   var length = 0;
+  // eslint-disable-next-line
   var range = document.createRange();
   var it = iterator(el)
     .select(Node.TEXT_NODE)

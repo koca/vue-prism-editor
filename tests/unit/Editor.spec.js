@@ -1,31 +1,33 @@
+import Vue from "vue";
 import { mount } from "@vue/test-utils";
 import Editor from "@/components/Editor.vue";
 import "prismjs";
+// jest.mock("prismjs");
 import { compileToFunctions } from "vue-template-compiler";
 
-document.createRange = jest.fn();
-global.getSelection = jest.fn();
-global.getSelection.mockReturnValue({
-  rangeCount: 1,
-  getRangeAt: jest.fn().mockReturnValue({
-    cloneRange: jest.fn().mockReturnValue({
-      selectNodeContents: jest.fn(),
-      setEnd: jest.fn(),
-      setStart: jest.fn()
-    })
-  })
-});
-
+global.window.getSelection = jest.fn(() => ({}));
 describe("Editor.vue", () => {
-  test("renders", () => {
-    let code = "initialCode";
+  it("renders", () => {
+    const code = "initialCode";
     const wrapper = mount(Editor, {
       propsData: { code }
     });
     expect(wrapper.html()).toContain(code);
   });
-  test("emits change event", () => {
-    let code = "console.log('test')";
+  it("sets contentEditable", () => {
+    const wrapper = mount(Editor);
+    expect(
+      wrapper.find(".prism-editor__code").attributes().contenteditable
+    ).toBe("true");
+    wrapper.setProps({
+      readonly: true
+    });
+    expect(
+      wrapper.find(".prism-editor__code").attributes().contenteditable
+    ).toBe("false");
+  });
+  it("emits change event", () => {
+    const code = "console.log('test')";
     const wrapper = mount(Editor);
     const $pre = wrapper.find(".prism-editor__code");
     $pre.element.innerHTML = code;
@@ -33,7 +35,7 @@ describe("Editor.vue", () => {
     expect(wrapper.emitted("change")[0]).toEqual([code]);
   });
 
-  test("v-model works", () => {
+  it("v-model works", () => {
     const compiled = compileToFunctions(
       '<div><Editor class="foo" v-model="code" /></div>'
     );
@@ -51,5 +53,55 @@ describe("Editor.vue", () => {
     $pre.element.innerHTML = "works";
     wrapper.vm.$children[0].$emit("change", "works");
     expect(wrapper.vm.code).toEqual("works");
+  });
+
+  it("emits keydown event", () => {
+    const mockHandler = jest.fn();
+    const code = "console.log('test')";
+    const wrapper = mount(Editor, {
+      propsData: {
+        emitEvents: true
+      },
+      listeners: {
+        keydown: mockHandler
+      }
+    });
+    const $pre = wrapper.find(".prism-editor__code");
+    $pre.element.innerHTML = code;
+    $pre.trigger("keydown");
+    expect(wrapper.emitted()["keydown"]).toBeTruthy();
+    expect(mockHandler).toHaveBeenCalled();
+  });
+
+  it("emits keyup event", () => {
+    const mockHandler = jest.fn();
+    const code = "console.log('test')";
+    const wrapper = mount(Editor, {
+      propsData: {
+        emitEvents: true
+      },
+      listeners: {
+        keyup: mockHandler
+      }
+    });
+    const $pre = wrapper.find(".prism-editor__code");
+    $pre.element.innerHTML = code;
+    $pre.trigger("keyup");
+    expect(wrapper.emitted()["keyup"]).toBeTruthy();
+    expect(mockHandler).toHaveBeenCalled();
+  });
+
+  it("not neccessary but", async () => {
+    const code = "log()";
+    const wrapper = mount(Editor, {
+      propsData: {
+        code
+      },
+      sync: false
+    });
+
+    expect(wrapper.vm.content).toBe(
+      `<code><span class="token function">log</span><span class="token punctuation">(</span><span class="token punctuation">)</span></code>`
+    );
   });
 });

@@ -106,20 +106,24 @@ OR:
 
 | Name                 | Type      | Default | Options                              | Description                                           |
 | -------------------- | --------- | ------- | ------------------------------------ | ----------------------------------------------------- |
+| v-model              | `string`  | -       | -                                    | for the `code` prop below                             |
 | code                 | `string`  | `""`    | -                                    | the code                                              |
 | language             | `String`  | `"js"`  | `vue,html,md,ts` + Prismjs Languages | language of the code                                  |
 | lineNumbers          | `Boolean` | `false` | -                                    | Whether to show line numbers or not                   |
 | readonly             | `Boolean` | `false` | -                                    | Indicates if the editor is read only or not.          |
-| emitEvents           | `Boolean` | `false` | -                                    | Indicates if the editor should emit events.                  |
+| emitEvents           | `Boolean` | `false` | -                                    | Indicates if the editor should emit events.           |
 | autoStyleLineNumbers | `Boolean` | `true`  | -                                    | Allow the line number to be styled by this component. |
 
 ## Events
 
-Those events won't fire unless you set the `emitEvents` prop to `true`.
+| Name   | Parameters | Description                     |
+| ------ | ---------- | ------------------------------- |
+| change | `(code)`   | Fires when the code is changed. |
+
+The events below won't be fired unless you set the `emitEvents` prop to `true`.
 
 | Name         | Parameters | Description                                                                 |
 | ------------ | ---------- | --------------------------------------------------------------------------- |
-| change       | `(event)`  | Fires when the value is changed.                                            |
 | keydown      | `(event)`  | This event is emitted when a keydown event happens in editor                |
 | keyup        | `(event)`  | This event is emitted when a keyup event happens in editor                  |
 | editor-click | `(event)`  | This event is emitted  when clicking anywhere in the contenteditable editor |

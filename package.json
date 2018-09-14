@@ -1,12 +1,13 @@
 {
   "name": "vue-prism-editor",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "scripts": {
     "serve": "vue-cli-service serve",
-    "build": "vue-cli-service build --dest site",
+    "build:site": "vue-cli-service build --dest site",
     "lint": "vue-cli-service lint",
-    "build:lib": "vue-cli-service build --target lib --name VuePrismEditor ./src/components/Editor.vue && rimraf dist/demo.html",
-    "test:unit": "vue-cli-service test:unit"
+    "build": "vue-cli-service build --target lib --name VuePrismEditor ./src/components/Editor.vue && rimraf dist/demo.html",
+    "test:unit": "vue-cli-service test:unit",
+    "publish-pkg": "npm run build && npm publish"
   },
   "dependencies": {
     "dom-iterator": "^1.0.0",

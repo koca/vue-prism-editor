@@ -31,10 +31,14 @@ import selectionRange from "../utils/selection-range.js";
 import { getIndent, getDeindentLevel } from "../utils/getIndent";
 
 export default {
+  model: {
+    prop: "code",
+    event: "change"
+  },
   props: {
     emitEvents: {
       type: Boolean,
-      default: true
+      default: false
     },
     language: {
       type: String,
@@ -220,9 +224,7 @@ export default {
       this.$nextTick(() => {
         this.codeData = plain;
       });
-      if (this.emitEvents) {
-        this.$emit("change", plain);
-      }
+      this.$emit("change", plain);
     },
     restoreStackState(offset) {
       const { plain, selection } = this.undoStack[

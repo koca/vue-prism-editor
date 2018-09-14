@@ -1,35 +1,13 @@
 {
   "name": "vue-prism-editor",
-  "version": "0.0.1",
-  "description": "A dead simple code editor with syntax highlighting and line numbers.",
-  "keywords": [
-    "vue",
-    "editor",
-    "code editor",
-    "prism"
-  ],
-  "main": "dist/VuePrismEditor.umd.js",
-  "module": "dist/VuePrismEditor.common.js",
-  "unpkg": "dist/VuePrismEditor.umd.min.js",
+  "version": "0.1.0",
   "scripts": {
     "serve": "vue-cli-service serve",
     "build": "vue-cli-service build --dest site",
+    "lint": "vue-cli-service lint",
     "build:lib": "vue-cli-service build --target lib --name VuePrismEditor ./src/components/Editor.vue && rimraf dist/demo.html",
-    "lint": "vue-cli-service lint"
+    "test:unit": "vue-cli-service test:unit"
   },
-  "author": {
-    "name": "Mesut Koca",
-    "email": "imesutkoca@gmail.com"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/koca/vue-prism-editor.git"
-  },
-  "bugs": {
-    "url": "https://github.com/koca/vue-prism-editor/issues"
-  },
-  "homepage": "https://github.com/koca/vue-prism-editor#readme",
-  "license": "MIT",
   "dependencies": {
     "dom-iterator": "^1.0.0",
     "escape-html": "^1.0.3",
@@ -39,8 +17,12 @@
     "@vue/cli-plugin-babel": "^3.0.0-beta.15",
     "@vue/cli-plugin-eslint": "^3.0.0-beta.15",
     "@vue/cli-plugin-pwa": "^3.0.0-beta.15",
+    "@vue/cli-plugin-unit-jest": "^3.0.3",
     "@vue/cli-service": "^3.0.0-beta.15",
     "@vue/eslint-config-prettier": "^3.0.0-beta.15",
+    "@vue/test-utils": "^1.0.0-beta.20",
+    "babel-core": "7.0.0-bridge.0",
+    "babel-jest": "^23.0.1",
     "prismjs": "^1.15.0",
     "register-service-worker": "^1.5.2",
     "rimraf": "^2.6.2",
@@ -52,5 +34,28 @@
     "> 1%",
     "last 2 versions",
     "not ie <= 8"
-  ]
+  ],
+  "unpkg": "dist/VuePrismEditor.umd.min.js",
+  "module": "dist/VuePrismEditor.common.js",
+  "main": "dist/VuePrismEditor.umd.js",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/koca/vue-prism-editor.git"
+  },
+  "bugs": {
+    "url": "https://github.com/koca/vue-prism-editor/issues"
+  },
+  "homepage": "https://github.com/koca/vue-prism-editor#readme",
+  "license": "MIT",
+  "keywords": [
+    "vue",
+    "editor",
+    "code editor",
+    "prism"
+  ],
+  "description": "A dead simple code editor with syntax highlighting and line numbers.",
+  "author": {
+    "name": "Mesut Koca",
+    "email": "imesutkoca@gmail.com"
+  }
 }

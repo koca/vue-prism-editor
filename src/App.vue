@@ -25,7 +25,7 @@
       <Editor
         class="my-editor"
         language="html"
-        :code="code"
+        v-model="code"
         :line-numbers="lineNumbers"
         :readonly="readonly"
         ></Editor>

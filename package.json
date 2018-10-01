@@ -24,6 +24,7 @@
     "@vue/test-utils": "^1.0.0-beta.20",
     "babel-core": "7.0.0-bridge.0",
     "babel-jest": "^23.0.1",
+    "lint-staged": "^7.3.0",
     "prismjs": "^1.15.0",
     "register-service-worker": "^1.5.2",
     "rimraf": "^2.6.2",
@@ -58,5 +59,18 @@
   "author": {
     "name": "Mesut Koca",
     "email": "imesutkoca@gmail.com"
+  },
+  "gitHooks": {
+    "pre-commit": "lint-staged"
+  },
+  "lint-staged": {
+    "*.js": [
+      "vue-cli-service lint",
+      "git add"
+    ],
+    "*.vue": [
+      "vue-cli-service lint",
+      "git add"
+    ]
   }
 }

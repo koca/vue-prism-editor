@@ -1,5 +1,16 @@
 # Vue Prism Editor
 
+<p align="center">
+
+
+![version](https://img.shields.io/npm/v/vue-prism-editor.svg)
+![npm bundle size (minified + gzip)](https://img.shields.io/bundlephobia/minzip/vue-prism-editor.svg)
+[![GitHub](https://img.shields.io/github/license/mashape/apistatus.svg)](https://github.com/koca/vue-prism-editor)
+[![CircleCI branch](https://circleci.com/gh/koca/vue-prism-editor/tree/master.svg?style=shield)](https://circleci.com/gh/koca/vue-prism-editor/tree/master)
+<!-- ![Codecov](https://img.shields.io/codecov/c/github/koca/vue-prism-editor.svg) -->
+
+</p>
+
 > A dead simple code editor with syntax highlighting and line numbers. 7kb/gz
 
 ## Demo

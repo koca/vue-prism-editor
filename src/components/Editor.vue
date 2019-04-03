@@ -85,7 +85,8 @@ export default {
       undoOffset: 0,
       undoTimestamp: 0,
       lastPos: 0,
-      codeData: ""
+      codeData: "",
+      composing: false
     };
   },
   watch: {

@@ -1,12 +1,28 @@
 <template>
   <div class="prism-editor-wrapper">
-    <div class="prism-editor__line-numbers" aria-hidden="true" v-if="lineNumbers" :style="{'min-height': lineNumbersHeight}">
-      <div class="prism-editor__line-width-calc" style="height: 0px; visibility: hidden; pointer-events: none;">999</div>
-      <div class="prism-editor__line-number token comment" v-for="line in lineNumbersCount" :key="line">{{line}}</div>
+    <div
+      class="prism-editor__line-numbers"
+      aria-hidden="true"
+      v-if="lineNumbers"
+      :style="{ 'min-height': lineNumbersHeight }"
+    >
+      <div
+        class="prism-editor__line-width-calc"
+        style="height: 0px; visibility: hidden; pointer-events: none;"
+      >
+        999
+      </div>
+      <div
+        class="prism-editor__line-number token comment"
+        v-for="line in lineNumbersCount"
+        :key="line"
+      >
+        {{ line }}
+      </div>
     </div>
     <pre
       class="prism-editor__code"
-      :class="{['language-'+language]: true}"
+      :class="{ ['language-' + language]: true }"
       ref="pre"
       v-html="content"
       :contenteditable="!readonly"
@@ -18,7 +34,7 @@
       autocomplete="off"
       autocorrect="off"
       data-gramm="false"
-      ></pre>
+    ></pre>
   </div>
 </template>
 
@@ -140,6 +156,13 @@ export default {
     $pre.addEventListener("paste", onPaste);
     this.$once("hook:beforeDestroy", () => {
       $pre.removeEventListener("paste", onPaste);
+    });
+    $pre.addEventListener("compositionstart", () => {
+      this.composing = true;
+    });
+    $pre.addEventListener("compositionend", () => {
+      // for canceling input.
+      this.composing = false;
     });
   },
 
@@ -304,6 +327,18 @@ export default {
       }
     },
     handleKeyUp(evt) {
+      const keyupCode = evt.which;
+      if (this.composing) {
+        if (keyupCode === 13) {
+          // finish inputting via IM.
+          this.composing = false;
+        } else {
+          // now inputting words using IM.
+          // must not update view.
+          return;
+        }
+      }
+
       if (this.emitEvents) {
         this.$emit("keyup", evt);
       }
@@ -340,7 +375,6 @@ export default {
   }
 };
 </script>
-
 
 <style>
 .prism-editor-wrapper code {

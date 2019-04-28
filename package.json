@@ -74,7 +74,7 @@
       ]
     },
     "ignore": [
-      "**/dist/*.min.js"
+      "dist/*"
     ]
   }
 }

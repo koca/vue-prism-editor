@@ -1,0 +1,7 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Editor.vue renders with null value 1`] = `
+<div class="prism-editor-wrapper">
+  <!----> <pre contenteditable="true" spellcheck="false" autocapitalize="off" autocomplete="off" autocorrect="off" data-gramm="false" class="prism-editor__code language-js"><code></code></pre>
+</div>
+`;

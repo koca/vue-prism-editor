@@ -69,6 +69,14 @@ describe("Editor.vue", () => {
     expect(mockHandler).toHaveBeenCalled();
   });
 
+  it("renders with null value", () => {
+    const code = null;
+    const wrapper = mount(Editor, {
+      propsData: { code }
+    });
+    expect(wrapper.html()).toMatchSnapshot();
+  });
+
   it("emits keyup event", () => {
     const mockHandler = jest.fn();
     const code = "console.log('test')";

@@ -93,7 +93,11 @@ export default {
     code: {
       immediate: true,
       handler(newVal) {
-        this.codeData = newVal;
+        if (!newVal) {
+          this.codeData = "";
+        } else {
+          this.codeData = newVal;
+        }
       }
     },
     content: {

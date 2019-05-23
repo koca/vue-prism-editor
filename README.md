@@ -57,7 +57,7 @@ Register the component locally and use it (recommended)
 
 ```html
 <template>
-  <prism-editor :code="code" language="js"></prism-editor>
+  <prism-editor code="code" language="js"></prism-editor>
 </template>
 
 <script>

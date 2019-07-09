@@ -104,6 +104,8 @@ This package won't install Prismjs. If you use Prismjs already skip this step. I
 // yarn add prismjs
 import "prismjs";
 import "prismjs/themes/prism.css";
+// import specific languages
+import "prismjs/components/prism-markdown";
 ```
 
 OR:

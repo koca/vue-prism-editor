@@ -104,8 +104,8 @@ describe("Editor.vue", () => {
       sync: false
     });
 
-    expect(wrapper.vm.content).toBe(
-      `<code><span class="token function">log</span><span class="token punctuation">(</span><span class="token punctuation">)</span></code>`
+    expect(wrapper.vm.content).toMatchInlineSnapshot(
+      `<code class="language-js"><span class="token function">log</span><span class="token punctuation">(</span><span class="token punctuation">)</span></code>`
     );
   });
 });

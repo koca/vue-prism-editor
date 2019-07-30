@@ -1,6 +1,6 @@
 {
   "name": "vue-prism-editor",
-  "version": "0.2.1",
+  "version": "0.3.0",
   "scripts": {
     "serve": "vue-cli-service serve",
     "build:site": "vue-cli-service build --dest site",

@@ -62,6 +62,7 @@ Register the component locally and use it (recommended)
 
 <script>
 import PrismEditor from 'vue-prism-editor'
+import "vue-prism-editor/dist/VuePrismEditor.css"; // don't forget the styles!
 export default {
   components: {
     PrismEditor
@@ -70,11 +71,13 @@ export default {
 </script>
 ```
 
+**_Note! Don't forget to import the CSS too!_**
+
 Or register the component globally in `main.js`
 
 ```js
 import VuePrismEditor from "vue-prism-editor";
-import "vue-prism-editor/dist/VuePrismEditor.css"; // import the styles
+import "vue-prism-editor/dist/VuePrismEditor.css"; // don't forget the styles!
 Vue.component("prism-editor", VuePrismEditor);
 ```
 

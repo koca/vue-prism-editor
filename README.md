@@ -57,11 +57,15 @@ Register the component locally and use it (recommended)
 
 ```html
 <template>
-  <prism-editor :code="code" language="js"></prism-editor>
+  <prism-editor v-model="code" language="js"></prism-editor>
 </template>
 
 <script>
+import 'prismjs'
+import 'prismjs/themes/prism.css'
+import 'vue-prism-editor/dist/VuePrismEditor.css'  
 import PrismEditor from 'vue-prism-editor'
+  
 export default {
   components: {
     PrismEditor

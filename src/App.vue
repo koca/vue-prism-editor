@@ -4,20 +4,24 @@
       <div class="hero py-8 sm:pt-24 text-center">
         <div class="hero-text font-mono text-xl w-64 sm:w-full mx-auto">
           <h1 class="text-2xl">Vue Prism Code Editor</h1>
-          <h3 class="font-normal text-xl mt-4">A dead simple code editor with syntax highlighting and line numbers. 7kb/gz</h3>
+          <h3 class="font-normal text-xl mt-4">
+            A dead simple code editor with syntax highlighting and line numbers.
+            7kb/gz
+          </h3>
         </div>
         <div class="hero-options my-8 w-64 max-w-sm sm:w-full mx-auto">
-            <label for="ln" class="">
-              <input type="checkbox" name="ln" v-model="lineNumbers">
-              Line Numbers
-            </label>
-            <label for="ln" class="ml-4">
-              <input type="checkbox" name="ln" v-model="readonly">
-              Readonly
-            </label>
+          <label for="ln" class="">
+            <input type="checkbox" name="ln" v-model="lineNumbers" />
+            Line Numbers
+          </label>
+          <label for="ln" class="ml-4">
+            <input type="checkbox" name="ln" v-model="readonly" />
+            Readonly
+          </label>
         </div>
         <div class="hero-info">
-          Documentation on <a href="https://github.com/koca/vue-prism-editor">Github</a>
+          Documentation on
+          <a href="https://github.com/koca/vue-prism-editor">Github</a>
         </div>
       </div>
     </header>
@@ -28,7 +32,7 @@
         v-model="code"
         :line-numbers="lineNumbers"
         :readonly="readonly"
-        ></Editor>
+      ></Editor>
     </main>
   </div>
 </template>

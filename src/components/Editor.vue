@@ -29,6 +29,8 @@
       @keydown="handleKeyDown"
       @keyup="handleKeyUp"
       @click="handleClick"
+      @focusin="handleFocusin"
+      @focusout="handleFocusout"
       spellCheck="false"
       autocapitalize="off"
       autocomplete="off"
@@ -276,6 +278,12 @@ export default {
       }
 
       this.restoreStackState(offset);
+    },
+    handleFocusin(evt) {
+      this.$emit("focusin", evt);
+    },
+    handleFocusout(evt) {
+      this.$emit("focusout", evt);
     },
     handleKeyDown(evt) {
       if (this.emitEvents) {

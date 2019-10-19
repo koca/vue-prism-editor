@@ -39,6 +39,23 @@
 
 The goal of this project is to have a simple code editor. You can use to make small changes of some content or you just need a textarea with syntax highlighting. That's what it's good for. If you need an advanced code editor use Codemirror or Monaco Editor.
 
+## Prismjs dependacies
+
+First of all, this project needs Prismjs and this package won't install Prismjs. If you use Prismjs already skip this step. If not you need to load Prismjs somewhere in your app:
+
+```js
+// yarn add prismjs
+import "prismjs";
+import "prismjs/themes/prism.css";
+```
+
+OR:
+
+```html
+<link rel="stylesheet" href="https://unpkg.com/prismjs/themes/prism.css" />
+<script src="https://unpkg.com/prismjs"></script>
+```
+
 ## Install
 
 ```sh
@@ -94,23 +111,6 @@ new Vue({
     el: '#app'
 })
 </script>
-```
-
-## Prismjs
-
-This package won't install Prismjs. If you use Prismjs already skip this step. If not you need to load Prismjs somewhere in your app:
-
-```js
-// yarn add prismjs
-import "prismjs";
-import "prismjs/themes/prism.css";
-```
-
-OR:
-
-```html
-<link rel="stylesheet" href="https://unpkg.com/prismjs/themes/prism.css" />
-<script src="https://unpkg.com/prismjs"></script>
 ```
 
 ## Props

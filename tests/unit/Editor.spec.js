@@ -51,6 +51,26 @@ describe("Editor.vue", () => {
     expect(wrapper.vm.code).toEqual("works");
   });
 
+  it("code with sync modifier works", () => {
+    const compiled = compileToFunctions(
+      '<div><Editor class="foo" :code.sync="code" /></div>'
+    );
+    const wrapper = mount(compiled, {
+      data: () => ({
+        code: "test"
+      }),
+      stubs: {
+        Editor
+      }
+    });
+    const $pre = wrapper.find("pre");
+
+    expect(wrapper.vm.code).toEqual("test");
+    $pre.element.innerHTML = "works";
+    wrapper.vm.$children[0].$emit("update:code", "works");
+    expect(wrapper.vm.code).toEqual("works");
+  });
+
   it("emits keydown event", () => {
     const mockHandler = jest.fn();
     const code = "console.log('test')";

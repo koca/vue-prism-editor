@@ -252,6 +252,7 @@ export default {
     },
     updateContent(plain) {
       this.$emit("change", plain);
+      this.$emit("update:code", plain);
     },
     restoreStackState(offset) {
       const { plain, selection } = this.undoStack[

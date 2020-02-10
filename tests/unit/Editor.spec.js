@@ -13,6 +13,7 @@ describe("Editor.vue", () => {
     });
     expect(wrapper.html()).toContain(code);
   });
+
   it("sets contentEditable", () => {
     const wrapper = mount(Editor);
     const $pre = wrapper.find("pre");
@@ -22,6 +23,7 @@ describe("Editor.vue", () => {
     });
     expect($pre.attributes().contenteditable).toBe("false");
   });
+
   it("emits change event", () => {
     const code = "console.log('test')";
     const wrapper = mount(Editor);
@@ -93,6 +95,80 @@ describe("Editor.vue", () => {
     $pre.trigger("keyup");
     expect(wrapper.emitted()["keyup"]).toBeTruthy();
     expect(mockHandler).toHaveBeenCalled();
+  });
+
+  it("emit change event for non forbidden key", () => {
+    const mockHandler = jest.fn();
+    const wrapper = mount(Editor, {
+      listeners: {
+        change: mockHandler
+      }
+    });
+    const $pre = wrapper.find("pre");
+    const sentence = "vue-prism-editor";
+
+    $pre.element.dispatchEvent(new KeyboardEvent("keyup", { keyCode: 86 })); // v
+    $pre.element.dispatchEvent(new KeyboardEvent("keyup", { keyCode: 85 })); // u
+    $pre.element.dispatchEvent(new KeyboardEvent("keyup", { keyCode: 69 })); // e
+    $pre.element.dispatchEvent(new KeyboardEvent("keyup", { keyCode: 189 })); // -
+    $pre.element.dispatchEvent(new KeyboardEvent("keyup", { keyCode: 80 })); // p
+    $pre.element.dispatchEvent(new KeyboardEvent("keyup", { keyCode: 82 })); // r
+    $pre.element.dispatchEvent(new KeyboardEvent("keyup", { keyCode: 73 })); // i
+    $pre.element.dispatchEvent(new KeyboardEvent("keyup", { keyCode: 83 })); // s
+    $pre.element.dispatchEvent(new KeyboardEvent("keyup", { keyCode: 77 })); // m
+    $pre.element.dispatchEvent(new KeyboardEvent("keyup", { keyCode: 189 })); // -
+    $pre.element.dispatchEvent(new KeyboardEvent("keyup", { keyCode: 69 })); // e
+    $pre.element.dispatchEvent(new KeyboardEvent("keyup", { keyCode: 68 })); // d
+    $pre.element.dispatchEvent(new KeyboardEvent("keyup", { keyCode: 73 })); // i
+    $pre.element.dispatchEvent(new KeyboardEvent("keyup", { keyCode: 84 })); // t
+    $pre.element.dispatchEvent(new KeyboardEvent("keyup", { keyCode: 79 })); // o
+    $pre.element.dispatchEvent(new KeyboardEvent("keyup", { keyCode: 82 })); // r
+
+    expect(mockHandler).toHaveBeenCalledTimes(sentence.length);
+  });
+
+  it("won't emit change event for forbidden key", () => {
+    const mockHandler = jest.fn();
+    const wrapper = mount(Editor, {
+      listeners: {
+        change: mockHandler
+      }
+    });
+    const $pre = wrapper.find("pre");
+
+    $pre.element.dispatchEvent(new KeyboardEvent("keyup", { keyCode: 16 }));
+    $pre.element.dispatchEvent(new KeyboardEvent("keyup", { keyCode: 16 })); // shift
+    $pre.element.dispatchEvent(new KeyboardEvent("keyup", { keyCode: 17 })); // ctrl
+    $pre.element.dispatchEvent(new KeyboardEvent("keyup", { keyCode: 18 })); // alt
+    $pre.element.dispatchEvent(new KeyboardEvent("keyup", { keyCode: 19 })); // pauseBreak
+    $pre.element.dispatchEvent(new KeyboardEvent("keyup", { keyCode: 20 })); // capsLock
+    $pre.element.dispatchEvent(new KeyboardEvent("keyup", { keyCode: 27 })); // esc
+    $pre.element.dispatchEvent(new KeyboardEvent("keyup", { keyCode: 33 })); // pageUp
+    $pre.element.dispatchEvent(new KeyboardEvent("keyup", { keyCode: 34 })); // pageDown
+    $pre.element.dispatchEvent(new KeyboardEvent("keyup", { keyCode: 35 })); // end
+    $pre.element.dispatchEvent(new KeyboardEvent("keyup", { keyCode: 36 })); // home
+    $pre.element.dispatchEvent(new KeyboardEvent("keyup", { keyCode: 37 })); // arrowLeft
+    $pre.element.dispatchEvent(new KeyboardEvent("keyup", { keyCode: 38 })); // arrowUp
+    $pre.element.dispatchEvent(new KeyboardEvent("keyup", { keyCode: 39 })); // arrowRight
+    $pre.element.dispatchEvent(new KeyboardEvent("keyup", { keyCode: 40 })); // arrowDown
+    $pre.element.dispatchEvent(new KeyboardEvent("keyup", { keyCode: 44 })); // printScreen
+    $pre.element.dispatchEvent(new KeyboardEvent("keyup", { keyCode: 91 })); // meta
+    $pre.element.dispatchEvent(new KeyboardEvent("keyup", { keyCode: 112 })); // f1
+    $pre.element.dispatchEvent(new KeyboardEvent("keyup", { keyCode: 113 })); // f2
+    $pre.element.dispatchEvent(new KeyboardEvent("keyup", { keyCode: 114 })); // f3
+    $pre.element.dispatchEvent(new KeyboardEvent("keyup", { keyCode: 115 })); // f4
+    $pre.element.dispatchEvent(new KeyboardEvent("keyup", { keyCode: 116 })); // f5
+    $pre.element.dispatchEvent(new KeyboardEvent("keyup", { keyCode: 117 })); // f6
+    $pre.element.dispatchEvent(new KeyboardEvent("keyup", { keyCode: 118 })); // f7
+    $pre.element.dispatchEvent(new KeyboardEvent("keyup", { keyCode: 119 })); // f8
+    $pre.element.dispatchEvent(new KeyboardEvent("keyup", { keyCode: 120 })); // f9
+    $pre.element.dispatchEvent(new KeyboardEvent("keyup", { keyCode: 121 })); // f10
+    $pre.element.dispatchEvent(new KeyboardEvent("keyup", { keyCode: 122 })); // f11
+    $pre.element.dispatchEvent(new KeyboardEvent("keyup", { keyCode: 123 })); // f12
+    $pre.element.dispatchEvent(new KeyboardEvent("keyup", { keyCode: 144 })); // numLock
+    $pre.element.dispatchEvent(new KeyboardEvent("keyup", { keyCode: 145 })); // scrollLock
+
+    expect(mockHandler).toHaveBeenCalledTimes(0);
   });
 
   it("not neccessary but", async () => {

@@ -45,6 +45,7 @@ import normalizeHtml from "../utils/normalizeHtml.js";
 import htmlToPlain from "../utils/htmlToPlain.js";
 import selectionRange from "../utils/selection-range.js";
 import { getIndent, getDeindentLevel } from "../utils/getIndent";
+import { FORBIDDEN_KEYS } from "../utils/constant";
 
 export default {
   model: {
@@ -363,12 +364,7 @@ export default {
 
       this.selection = selectionRange(this.$refs.pre);
 
-      if (
-        evt.keyCode !== 37 && // left
-        evt.keyCode !== 38 && // up
-        evt.keyCode !== 39 && // right
-        evt.keyCode !== 40 // down
-      ) {
+      if (!Object.values(FORBIDDEN_KEYS).includes(evt.keyCode)) {
         const plain = this.getPlain();
 
         this.recordChange(plain, this.selection);

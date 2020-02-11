@@ -53,6 +53,17 @@ describe("Editor.vue", () => {
     expect(wrapper.vm.code).toEqual("works");
   });
 
+  it("works without v-model", () => {
+    const wrapper = mount(Editor, {
+      emitEvents: true
+    });
+
+    wrapper.vm.codeData = "<html>";
+    expect(wrapper.vm.content).toBe(
+      `<code class="language-js"><span class="token operator">&lt;</span>html<span class="token operator">></span></code>`
+    );
+  });
+
   it("code with sync modifier works", () => {
     const compiled = compileToFunctions(
       '<div><Editor class="foo" :code.sync="code" /></div>'
@@ -156,7 +167,6 @@ describe("Editor.vue", () => {
     });
     const $pre = wrapper.find("pre");
 
-    $pre.element.dispatchEvent(new KeyboardEvent("keyup", { keyCode: 16 }));
     $pre.element.dispatchEvent(new KeyboardEvent("keyup", { keyCode: 16 })); // shift
     $pre.element.dispatchEvent(new KeyboardEvent("keyup", { keyCode: 17 })); // ctrl
     $pre.element.dispatchEvent(new KeyboardEvent("keyup", { keyCode: 18 })); // alt

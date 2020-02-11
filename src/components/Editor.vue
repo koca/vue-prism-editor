@@ -373,6 +373,8 @@ export default {
       } else {
         this.undoTimestamp = 0;
       }
+
+      this.$refs.pre.scrollIntoView({ block: "end" });
     }
   }
 };

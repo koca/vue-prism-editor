@@ -120,7 +120,7 @@ export default {
   },
   computed: {
     content() {
-      return prism(this.codeData, this.language);
+      return prism(this.codeData || "", this.language);
     },
     lineNumbersCount() {
       let totalLines = this.codeData.split(/\r\n|\n/).length;
@@ -344,6 +344,10 @@ export default {
           // must not update view.
           return;
         }
+      }
+
+      if (!this.code) {
+        this.codeData = evt.target.innerText;
       }
 
       if (this.emitEvents) {

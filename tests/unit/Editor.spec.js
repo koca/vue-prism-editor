@@ -91,6 +91,31 @@ describe("Editor.vue", () => {
     expect(mockHandler).toHaveBeenCalled();
   });
 
+  it("emits all pre events", () => {
+    const mockHandler = jest.fn();
+    const compiled = compileToFunctions(
+      '<div><Editor class="foo" @focus="eventHandler" @blur="eventHandler" @input="eventHandler" /></div>'
+    );
+    const wrapper = mount(compiled, {
+      data: () => ({
+        code: "test"
+      }),
+      stubs: {
+        Editor
+      },
+      methods: {
+        eventHandler: mockHandler
+      }
+    });
+    const $pre = wrapper.find("pre");
+
+    $pre.element.dispatchEvent(new Event("focus"));
+    $pre.element.dispatchEvent(new Event("blur"));
+    $pre.element.dispatchEvent(new Event("input"));
+
+    expect(mockHandler).toHaveBeenCalledTimes(3);
+  });
+
   it("renders with null value", () => {
     const code = null;
     const wrapper = mount(Editor, {

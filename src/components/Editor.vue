@@ -34,6 +34,7 @@
       autocomplete="off"
       autocorrect="off"
       data-gramm="false"
+      v-on="$listeners"
     ></pre>
   </div>
 </template>

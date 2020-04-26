@@ -2402,6 +2402,7 @@ var dom_iterator_default = /*#__PURE__*/__webpack_require__.n(dom_iterator);
 
 
 function position(el, pos) {
+  if (document.activeElement !== el) return;
   var selection = window.getSelection();
 
   if (1 == arguments.length) {

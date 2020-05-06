@@ -77,6 +77,10 @@ export default {
     code: {
       type: String,
       default: ""
+    },
+    highlight: {
+      type: Function,
+      default: prism
     }
   },
   data() {
@@ -121,7 +125,7 @@ export default {
   },
   computed: {
     content() {
-      return prism(this.codeData || "", this.language);
+      return this.highlight(this.codeData || "", this.language);
     },
     lineNumbersCount() {
       let totalLines = this.codeData.split(/\r\n|\n/).length;

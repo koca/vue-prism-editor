@@ -115,15 +115,16 @@ OR:
 
 ## Props
 
-| Name                 | Type      | Default | Options                              | Description                                           |
-| -------------------- | --------- | ------- | ------------------------------------ | ----------------------------------------------------- |
-| v-model              | `string`  | -       | -                                    | for the `code` prop below                             |
-| code                 | `string`  | `""`    | -                                    | the code                                              |
-| language             | `String`  | `"js"`  | `vue,html,md,ts` + Prismjs Languages | language of the code                                  |
-| lineNumbers          | `Boolean` | `false` | -                                    | Whether to show line numbers or not                   |
-| readonly             | `Boolean` | `false` | -                                    | Indicates if the editor is read only or not.          |
-| emitEvents           | `Boolean` | `false` | -                                    | Indicates if the editor should emit events.           |
-| autoStyleLineNumbers | `Boolean` | `true`  | -                                    | Allow the line number to be styled by this component. |
+| Name                 | Type       | Default | Options                              | Description                                           |
+| -------------------- | ---------- | ------- | ------------------------------------ | ----------------------------------------------------- |
+| v-model              | `string`   | -       | -                                    | for the `code` prop below                             |
+| code                 | `string`   | `""`    | -                                    | the code                                              |
+| language             | `String`   | `"js"`  | `vue,html,md,ts` + Prismjs Languages | language of the code                                  |
+| lineNumbers          | `Boolean`  | `false` | -                                    | Whether to show line numbers or not                   |
+| readonly             | `Boolean`  | `false` | -                                    | Indicates if the editor is read only or not.          |
+| emitEvents           | `Boolean`  | `false` | -                                    | Indicates if the editor should emit events.           |
+| autoStyleLineNumbers | `Boolean`  | `true`  | -                                    | Allow the line number to be styled by this component. |
+| highlight            | `Function` | `prism` | -                                    | Customize the highlighting of the code                |
 
 ## Events
 

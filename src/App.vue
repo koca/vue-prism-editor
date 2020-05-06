@@ -18,6 +18,10 @@
             <input type="checkbox" name="ln" v-model="readonly" />
             Readonly
           </label>
+          <label for="ln" class="ml-4">
+            <input type="checkbox" name="ln" v-model="customHighlight" />
+            Custom Highlight
+          </label>
         </div>
         <div class="hero-info">
           Documentation on
@@ -32,6 +36,7 @@
         v-model="code"
         :line-numbers="lineNumbers"
         :readonly="readonly"
+        :highlight="customHighlight ? highlight : undefined"
       ></Editor>
     </main>
   </div>
@@ -52,6 +57,7 @@ export default {
   data: () => ({
     lineNumbers: true,
     readonly: false,
+    customHighlight: false,
     /* eslint-disable */
     code: `<template>
   <div id="app">
@@ -74,6 +80,11 @@ export default {
   }),
   mounted() {
     console.log(Prism);
+  },
+  methods: {
+    highlight(src) {
+      return src.replace(/</g, "&lt;").replace(/>/g, "&gt;");
+    }
   }
 };
 </script>

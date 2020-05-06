@@ -10,16 +10,16 @@
           </h3>
         </div>
         <div class="hero-options my-8 w-64 max-w-sm sm:w-full mx-auto">
-          <label for="ln" class="">
+          <label class="">
             <input type="checkbox" name="ln" v-model="lineNumbers" />
             Line Numbers
           </label>
-          <label for="ln" class="ml-4">
-            <input type="checkbox" name="ln" v-model="readonly" />
+          <label class="ml-4">
+            <input type="checkbox" name="cb" v-model="readonly" />
             Readonly
           </label>
-          <label for="ln" class="ml-4">
-            <input type="checkbox" name="ln" v-model="customHighlight" />
+          <label class="ml-4">
+            <input type="checkbox" name="ch" v-model="customHighlight" />
             Custom Highlight
           </label>
         </div>

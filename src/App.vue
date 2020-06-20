@@ -39,7 +39,7 @@
 
 <script>
 import './assets/editorstyle.css';
-import Editor from './components/Editor.vue';
+import Editor from './components/Editor';
 import { highlight, languages } from 'prismjs/components/prism-core';
 import 'prismjs/components/prism-clike';
 import 'prismjs/components/prism-markup';

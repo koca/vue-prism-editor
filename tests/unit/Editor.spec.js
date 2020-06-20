@@ -6,7 +6,7 @@ import 'prismjs/components/prism-markup';
 import 'prismjs/components/prism-javascript';
 import 'prismjs/components/prism-css';
 
-import Editor from '@/components/Editor.vue';
+import Editor from '@/components/Editor';
 
 const render = (component, ...rest) => {
   const utils = VTLRender(component, ...rest);
@@ -42,7 +42,7 @@ const highlighter = code => {
   return `<span class="customHighlighter">${code}</span>`;
 };
 
-describe('Editor.vue', () => {
+describe('Editor', () => {
   test('renders with custom higlighter', async () => {
     const code = 'initialCode';
     const inlineAttrs = "v-model='code'";

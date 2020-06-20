@@ -1,51 +1,3 @@
-<template>
-  <div class="prism-editor-wrapper">
-    <div
-      class="prism-editor__line-numbers"
-      aria-hidden="true"
-      v-if="lineNumbers"
-      :style="{ 'min-height': lineNumbersHeight }"
-    >
-      <div
-        class="prism-editor__line-width-calc"
-        style="height: 0px; visibility: hidden; pointer-events: none;"
-      >
-        999
-      </div>
-      <div
-        class="prism-editor__line-number token comment"
-        v-for="line in lineNumbersCount"
-        :key="line"
-      >
-        {{ line }}
-      </div>
-    </div>
-    <div class="prism-editor__container">
-      <textarea
-        class="prism-editor__textarea"
-        :class="{ 'prism-editor__textarea--empty': isEmpty }"
-        @input="handleChange"
-        @keydown="handleKeyDown"
-        @keyup="$emit('keyup', $event)"
-        @focus="$emit('focus', $event)"
-        @blur="$emit('blur', $event)"
-        spellCheck="false"
-        autocapitalize="off"
-        autocomplete="off"
-        autocorrect="off"
-        data-gramm="false"
-        placeholder="WRITE IT DOWN"
-        data-testid="textarea"
-        :value="codeData"
-        ref="textarea"
-        :readonly="readonly"
-      ></textarea>
-      <pre class="prism-editor__editor" v-html="content" data-testid="preview" ref="pre"></pre>
-    </div>
-  </div>
-</template>
-
-<script>
 import './styles.css';
 
 const KEYCODE_ENTER = 13;
@@ -562,5 +514,85 @@ export default {
       }
     },
   },
+  render(h) {
+    const lineNumberWidthCalculator = h(
+      'div',
+      {
+        attrs: {
+          class: 'prism-editor__line-width-calc',
+          style: 'height: 0px; visibility: hidden; pointer-events: none;',
+        },
+      },
+      '999'
+    );
+    const lineNumbers = h(
+      'div',
+      {
+        staticClass: 'prism-editor__line-numbers',
+        style: {
+          'min-height': this.lineNumbersHeight,
+        },
+        attrs: {
+          'aria-hidden': 'true',
+        },
+      },
+      [
+        lineNumberWidthCalculator,
+        [...Array(this.lineNumbersCount)].map((_, index) => {
+          return h('div', { attrs: { class: 'prism-editor__line-number token comment' } }, ++index);
+        }),
+      ]
+    );
+    const textarea = h('textarea', {
+      ref: 'textarea',
+      on: {
+        input: this.handleChange,
+        keydown: this.handleKeyDown,
+        keyup: $event => {
+          this.$emit('keyup', $event);
+        },
+        focus: $event => {
+          this.$emit('focus', $event);
+        },
+        blur: $event => {
+          this.$emit('blur', $event);
+        },
+      },
+      staticClass: 'prism-editor__textarea',
+      class: {
+        'prism-editor__textarea--empty': this.isEmpty,
+      },
+      attrs: {
+        spellCheck: 'false',
+        autocapitalize: 'off',
+        autocomplete: 'off',
+        autocorrect: 'off',
+        'data-gramm': 'false',
+        placeholder: 'WRITE IT DOWN',
+        'data-testid': 'textarea',
+        readonly: this.readonly,
+      },
+      domProps: {
+        value: this.codeData,
+      },
+    });
+    const preview = h('pre', {
+      ref: 'pre',
+      staticClass: 'prism-editor__editor',
+      attrs: {
+        'data-testid': 'preview',
+      },
+      domProps: {
+        innerHTML: this.content,
+      },
+    });
+    const editorContainer = h('div', { staticClass: 'prism-editor__container' }, [
+      textarea,
+      preview,
+    ]);
+    return h('div', { staticClass: 'prism-editor-wrapper' }, [
+      this.lineNumbers && lineNumbers,
+      editorContainer,
+    ]);
+  },
 };
-</script>

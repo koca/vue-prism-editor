@@ -1,6 +1,6 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`Editor.vue linenumbers 1`] = `
+exports[`Editor linenumbers 1`] = `
 <DocumentFragment>
   <div
     class="prism-editor-wrapper"
@@ -14,20 +14,14 @@ exports[`Editor.vue linenumbers 1`] = `
         class="prism-editor__line-width-calc"
         style="height: 0px; visibility: hidden; pointer-events: none;"
       >
-        
-      999
-    
+        999
       </div>
-       
       <div
         class="prism-editor__line-number token comment"
       >
-        
-      1
-    
+        1
       </div>
     </div>
-     
     <div
       class="prism-editor__container"
     >
@@ -41,7 +35,6 @@ exports[`Editor.vue linenumbers 1`] = `
         placeholder="WRITE IT DOWN"
         spellcheck="false"
       />
-       
       <pre
         class="prism-editor__editor"
         data-testid="preview"
@@ -58,13 +51,11 @@ exports[`Editor.vue linenumbers 1`] = `
 </DocumentFragment>
 `;
 
-exports[`Editor.vue prism higlight works 1`] = `
+exports[`Editor prism higlight works 1`] = `
 <DocumentFragment>
   <div
     class="prism-editor-wrapper"
   >
-    <!---->
-     
     <div
       class="prism-editor__container"
     >
@@ -78,7 +69,6 @@ exports[`Editor.vue prism higlight works 1`] = `
         placeholder="WRITE IT DOWN"
         spellcheck="false"
       />
-       
       <pre
         class="prism-editor__editor"
         data-testid="preview"
@@ -167,13 +157,11 @@ exports[`Editor.vue prism higlight works 1`] = `
 </DocumentFragment>
 `;
 
-exports[`Editor.vue renders with custom higlighter 1`] = `
+exports[`Editor renders with custom higlighter 1`] = `
 <DocumentFragment>
   <div
     class="prism-editor-wrapper"
   >
-    <!---->
-     
     <div
       class="prism-editor__container"
     >
@@ -187,7 +175,6 @@ exports[`Editor.vue renders with custom higlighter 1`] = `
         placeholder="WRITE IT DOWN"
         spellcheck="false"
       />
-       
       <pre
         class="prism-editor__editor"
         data-testid="preview"
@@ -204,7 +191,7 @@ exports[`Editor.vue renders with custom higlighter 1`] = `
 </DocumentFragment>
 `;
 
-exports[`Editor.vue toggle line numbers 1`] = `
+exports[`Editor toggle line numbers 1`] = `
 <DocumentFragment>
   <div>
     <div
@@ -219,20 +206,14 @@ exports[`Editor.vue toggle line numbers 1`] = `
           class="prism-editor__line-width-calc"
           style="height: 0px; visibility: hidden; pointer-events: none;"
         >
-          
-      999
-    
+          999
         </div>
-         
         <div
           class="prism-editor__line-number token comment"
         >
-          
-      1
-    
+          1
         </div>
       </div>
-       
       <div
         class="prism-editor__container"
       >
@@ -246,7 +227,6 @@ exports[`Editor.vue toggle line numbers 1`] = `
           placeholder="WRITE IT DOWN"
           spellcheck="false"
         />
-         
         <pre
           class="prism-editor__editor"
           data-testid="preview"
@@ -270,16 +250,15 @@ exports[`Editor.vue toggle line numbers 1`] = `
 </DocumentFragment>
 `;
 
-exports[`Editor.vue toggle line numbers 2`] = `
+exports[`Editor toggle line numbers 2`] = `
 <DocumentFragment>
   <div>
     <div
       class="prism-editor-wrapper"
     >
-      <!---->
-       
       <div
         class="prism-editor__container"
+        style="font-family: monospace;"
       >
         <textarea
           autocapitalize="off"
@@ -291,11 +270,9 @@ exports[`Editor.vue toggle line numbers 2`] = `
           placeholder="WRITE IT DOWN"
           spellcheck="false"
         />
-         
         <pre
           class="prism-editor__editor"
           data-testid="preview"
-          style="border-top-left-radius: 0; border-bottom-left-radius: 0;"
         >
           <span
             class="customHighlighter"

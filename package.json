@@ -5,7 +5,7 @@
     "dev": "vue-cli-service serve",
     "build:site": "vue-cli-service build --dest site",
     "lint": "vue-cli-service lint",
-    "build": "vue-cli-service build --target lib --name VuePrismEditor ./src/components/Editor.vue && rimraf dist/demo.html",
+    "build": "vue-cli-service build --target lib --name VuePrismEditor ./src/components/Editor.js && rimraf dist/demo.html",
     "test": "jest",
     "test:watch": "jest --watchAll",
     "test:cov": "jest --collectCoverage",

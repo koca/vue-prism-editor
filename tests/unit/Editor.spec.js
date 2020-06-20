@@ -1,242 +1,500 @@
-import { mount } from "@vue/test-utils";
-import Editor from "@/components/Editor.vue";
-import "prismjs";
-// jest.mock("prismjs");
-import { compileToFunctions } from "vue-template-compiler";
+import '@testing-library/jest-dom/extend-expect';
+import { render as VTLRender, screen, fireEvent } from '@testing-library/vue';
+import { highlight, languages } from 'prismjs/components/prism-core';
+import 'prismjs/components/prism-clike';
+import 'prismjs/components/prism-markup';
+import 'prismjs/components/prism-javascript';
+import 'prismjs/components/prism-css';
 
-global.window.getSelection = jest.fn(() => ({}));
-describe("Editor.vue", () => {
-  it("renders", () => {
-    const code = "initialCode";
-    const wrapper = mount(Editor, {
-      propsData: { code }
-    });
-    expect(wrapper.html()).toContain(code);
-  });
+import Editor from '@/components/Editor.vue';
 
-  it("sets contentEditable", () => {
-    const wrapper = mount(Editor);
-    const $pre = wrapper.find("pre");
-    expect($pre.attributes().contenteditable).toBe("true");
-    wrapper.setProps({
-      readonly: true
-    });
-    expect($pre.attributes().contenteditable).toBe("false");
-  });
-
-  it("emits change event", () => {
-    const code = "console.log('test')";
-    const wrapper = mount(Editor);
-    const $pre = wrapper.find("pre");
-    $pre.element.innerHTML = code;
-    $pre.trigger("keyup");
-    expect(wrapper.emitted("change")[0]).toEqual([code]);
-  });
-
-  it("v-model works", () => {
-    const compiled = compileToFunctions(
-      '<div><Editor class="foo" v-model="code" /></div>'
-    );
-    const wrapper = mount(compiled, {
-      data: () => ({
-        code: "test"
-      }),
-      stubs: {
-        Editor
+const render = (component, ...rest) => {
+  const utils = VTLRender(component, ...rest);
+  return {
+    ...utils,
+    asFragment: (innerHTML = utils.container.innerHTML) => {
+      if (typeof document.createRange === 'function') {
+        return document.createRange().createContextualFragment(innerHTML);
       }
-    });
-    const $pre = wrapper.find("pre");
 
-    expect(wrapper.vm.code).toEqual("test");
-    $pre.element.innerHTML = "works";
-    wrapper.vm.$children[0].$emit("change", "works");
-    expect(wrapper.vm.code).toEqual("works");
+      const template = document.createElement('template');
+      template.innerHTML = innerHTML;
+      return template.content;
+    },
+  };
+};
+
+const renderComponent = ({ inlineAttrs, methods, ...props }) => {
+  const base = {
+    components: { Editor },
+    methods: {
+      highlight: highlighter,
+      ...methods,
+    },
+    template: `<Editor :highlight="highlight" ${inlineAttrs}></Editor>`,
+    ...props,
+  };
+  return render(base);
+};
+
+// custom higlighter
+const highlighter = code => {
+  return `<span class="customHighlighter">${code}</span>`;
+};
+
+describe('Editor.vue', () => {
+  test('renders with custom higlighter', async () => {
+    const code = 'initialCode';
+    const inlineAttrs = "v-model='code'";
+    const { asFragment } = renderComponent({
+      inlineAttrs,
+      data: () => ({ code }),
+    });
+
+    expect(asFragment()).toMatchSnapshot();
   });
 
-  it("works without v-model", () => {
-    const wrapper = mount(Editor, {
-      emitEvents: true
-    });
-
-    wrapper.vm.codeData = "<html>";
-    expect(wrapper.vm.content).toBe(
-      `<code class="language-js"><span class="token operator">&lt;</span>html<span class="token operator">></span></code>`
-    );
-  });
-
-  it("code with sync modifier works", () => {
-    const compiled = compileToFunctions(
-      '<div><Editor class="foo" :code.sync="code" /></div>'
-    );
-    const wrapper = mount(compiled, {
-      data: () => ({
-        code: "test"
-      }),
-      stubs: {
-        Editor
-      }
-    });
-    const $pre = wrapper.find("pre");
-
-    expect(wrapper.vm.code).toEqual("test");
-    $pre.element.innerHTML = "works";
-    wrapper.vm.$children[0].$emit("update:code", "works");
-    expect(wrapper.vm.code).toEqual("works");
-  });
-
-  it("emits keydown event", () => {
-    const mockHandler = jest.fn();
-    const code = "console.log('test')";
-    const wrapper = mount(Editor, {
-      propsData: {
-        emitEvents: true
-      },
-      listeners: {
-        keydown: mockHandler
-      }
-    });
-    const $pre = wrapper.find("pre");
-    $pre.element.innerHTML = code;
-    $pre.trigger("keydown");
-    expect(wrapper.emitted()["keydown"]).toBeTruthy();
-    expect(mockHandler).toHaveBeenCalled();
-  });
-
-  it("emits all pre events", () => {
-    const mockHandler = jest.fn();
-    const compiled = compileToFunctions(
-      '<div><Editor class="foo" @focus="eventHandler" @blur="eventHandler" @input="eventHandler" /></div>'
-    );
-    const wrapper = mount(compiled, {
-      data: () => ({
-        code: "test"
-      }),
-      stubs: {
-        Editor
-      },
-      methods: {
-        eventHandler: mockHandler
-      }
-    });
-    const $pre = wrapper.find("pre");
-
-    $pre.element.dispatchEvent(new Event("focus"));
-    $pre.element.dispatchEvent(new Event("blur"));
-    $pre.element.dispatchEvent(new Event("input"));
-
-    expect(mockHandler).toHaveBeenCalledTimes(3);
-  });
-
-  it("renders with null value", () => {
+  test('renders with no code', async () => {
     const code = null;
-    const wrapper = mount(Editor, {
-      propsData: { code }
-    });
-    expect(wrapper.html()).toMatchSnapshot();
+    const inlineAttrs = "v-model='code'";
+    renderComponent({ inlineAttrs, data: () => ({ code }) });
+    const textarea = screen.getByTestId('textarea');
+    const preview = screen.getByTestId('preview');
+
+    expect(textarea).toHaveValue('');
+    expect(preview.innerHTML).toMatchInlineSnapshot(`<span class="customHighlighter"></span><br>`);
   });
 
-  it("emits keyup event", () => {
-    const mockHandler = jest.fn();
-    const code = "console.log('test')";
-    const wrapper = mount(Editor, {
-      propsData: {
-        emitEvents: true
-      },
-      listeners: {
-        keyup: mockHandler
-      }
+  test('prism higlight works', async () => {
+    const prismHiglight = code => {
+      return highlight(
+        code,
+        {
+          ...languages['markup'],
+          ...languages['js'],
+          ...languages['css'],
+        },
+        'markup'
+      );
+    };
+    const code = `<template><div>hey</div></template>`.trim();
+    const inlineAttrs = "v-model='code'";
+    const { asFragment } = renderComponent({
+      inlineAttrs,
+      methods: { highlight: prismHiglight },
+      data: () => ({ code }),
     });
-    const $pre = wrapper.find("pre");
-    $pre.element.innerHTML = code;
-    $pre.trigger("keyup");
-    expect(wrapper.emitted()["keyup"]).toBeTruthy();
-    expect(mockHandler).toHaveBeenCalled();
+
+    expect(asFragment()).toMatchSnapshot();
   });
 
-  it("emit change event for non forbidden key", () => {
-    const mockHandler = jest.fn();
-    const wrapper = mount(Editor, {
-      listeners: {
-        change: mockHandler
-      }
-    });
-    const $pre = wrapper.find("pre");
-    const sentence = "vue-prism-editor";
+  test('readonly', () => {
+    const code = 'initialCode';
+    const inlineAttrs = `v-model="code" :readonly="true"`;
+    renderComponent({ inlineAttrs, data: () => ({ code }) });
 
-    $pre.element.dispatchEvent(new KeyboardEvent("keyup", { keyCode: 86 })); // v
-    $pre.element.dispatchEvent(new KeyboardEvent("keyup", { keyCode: 85 })); // u
-    $pre.element.dispatchEvent(new KeyboardEvent("keyup", { keyCode: 69 })); // e
-    $pre.element.dispatchEvent(new KeyboardEvent("keyup", { keyCode: 189 })); // -
-    $pre.element.dispatchEvent(new KeyboardEvent("keyup", { keyCode: 80 })); // p
-    $pre.element.dispatchEvent(new KeyboardEvent("keyup", { keyCode: 82 })); // r
-    $pre.element.dispatchEvent(new KeyboardEvent("keyup", { keyCode: 73 })); // i
-    $pre.element.dispatchEvent(new KeyboardEvent("keyup", { keyCode: 83 })); // s
-    $pre.element.dispatchEvent(new KeyboardEvent("keyup", { keyCode: 77 })); // m
-    $pre.element.dispatchEvent(new KeyboardEvent("keyup", { keyCode: 189 })); // -
-    $pre.element.dispatchEvent(new KeyboardEvent("keyup", { keyCode: 69 })); // e
-    $pre.element.dispatchEvent(new KeyboardEvent("keyup", { keyCode: 68 })); // d
-    $pre.element.dispatchEvent(new KeyboardEvent("keyup", { keyCode: 73 })); // i
-    $pre.element.dispatchEvent(new KeyboardEvent("keyup", { keyCode: 84 })); // t
-    $pre.element.dispatchEvent(new KeyboardEvent("keyup", { keyCode: 79 })); // o
-    $pre.element.dispatchEvent(new KeyboardEvent("keyup", { keyCode: 82 })); // r
-
-    expect(mockHandler).toHaveBeenCalledTimes(sentence.length);
+    expect(screen.getByTestId('textarea')).toHaveAttribute('readonly');
   });
 
-  it("won't emit change event for forbidden key", () => {
-    const mockHandler = jest.fn();
-    const wrapper = mount(Editor, {
-      listeners: {
-        change: mockHandler
-      }
+  test('linenumbers', () => {
+    const code = 'initialCode';
+    const inlineAttrs = `v-model="code" :line-numbers="true"`;
+    const { asFragment } = renderComponent({
+      inlineAttrs,
+      data: () => ({ code }),
     });
-    const $pre = wrapper.find("pre");
 
-    $pre.element.dispatchEvent(new KeyboardEvent("keyup", { keyCode: 16 })); // shift
-    $pre.element.dispatchEvent(new KeyboardEvent("keyup", { keyCode: 17 })); // ctrl
-    $pre.element.dispatchEvent(new KeyboardEvent("keyup", { keyCode: 18 })); // alt
-    $pre.element.dispatchEvent(new KeyboardEvent("keyup", { keyCode: 19 })); // pauseBreak
-    $pre.element.dispatchEvent(new KeyboardEvent("keyup", { keyCode: 20 })); // capsLock
-    $pre.element.dispatchEvent(new KeyboardEvent("keyup", { keyCode: 27 })); // esc
-    $pre.element.dispatchEvent(new KeyboardEvent("keyup", { keyCode: 33 })); // pageUp
-    $pre.element.dispatchEvent(new KeyboardEvent("keyup", { keyCode: 34 })); // pageDown
-    $pre.element.dispatchEvent(new KeyboardEvent("keyup", { keyCode: 35 })); // end
-    $pre.element.dispatchEvent(new KeyboardEvent("keyup", { keyCode: 36 })); // home
-    $pre.element.dispatchEvent(new KeyboardEvent("keyup", { keyCode: 37 })); // arrowLeft
-    $pre.element.dispatchEvent(new KeyboardEvent("keyup", { keyCode: 38 })); // arrowUp
-    $pre.element.dispatchEvent(new KeyboardEvent("keyup", { keyCode: 39 })); // arrowRight
-    $pre.element.dispatchEvent(new KeyboardEvent("keyup", { keyCode: 40 })); // arrowDown
-    $pre.element.dispatchEvent(new KeyboardEvent("keyup", { keyCode: 44 })); // printScreen
-    $pre.element.dispatchEvent(new KeyboardEvent("keyup", { keyCode: 91 })); // meta
-    $pre.element.dispatchEvent(new KeyboardEvent("keyup", { keyCode: 112 })); // f1
-    $pre.element.dispatchEvent(new KeyboardEvent("keyup", { keyCode: 113 })); // f2
-    $pre.element.dispatchEvent(new KeyboardEvent("keyup", { keyCode: 114 })); // f3
-    $pre.element.dispatchEvent(new KeyboardEvent("keyup", { keyCode: 115 })); // f4
-    $pre.element.dispatchEvent(new KeyboardEvent("keyup", { keyCode: 116 })); // f5
-    $pre.element.dispatchEvent(new KeyboardEvent("keyup", { keyCode: 117 })); // f6
-    $pre.element.dispatchEvent(new KeyboardEvent("keyup", { keyCode: 118 })); // f7
-    $pre.element.dispatchEvent(new KeyboardEvent("keyup", { keyCode: 119 })); // f8
-    $pre.element.dispatchEvent(new KeyboardEvent("keyup", { keyCode: 120 })); // f9
-    $pre.element.dispatchEvent(new KeyboardEvent("keyup", { keyCode: 121 })); // f10
-    $pre.element.dispatchEvent(new KeyboardEvent("keyup", { keyCode: 122 })); // f11
-    $pre.element.dispatchEvent(new KeyboardEvent("keyup", { keyCode: 123 })); // f12
-    $pre.element.dispatchEvent(new KeyboardEvent("keyup", { keyCode: 144 })); // numLock
-    $pre.element.dispatchEvent(new KeyboardEvent("keyup", { keyCode: 145 })); // scrollLock
-
-    expect(mockHandler).toHaveBeenCalledTimes(0);
+    expect(asFragment()).toMatchSnapshot();
   });
 
-  it("not neccessary but", async () => {
-    const code = "log()";
-    const wrapper = mount(Editor, {
-      propsData: {
-        code
-      },
-      sync: false
+  test('v-model works', async () => {
+    const code = 'initial code';
+    const inlineAttrs = `v-model="code"`;
+
+    renderComponent({ inlineAttrs, data: () => ({ code }) });
+
+    const textarea = screen.getByTestId('textarea');
+    const preview = screen.getByTestId('preview');
+
+    expect(preview).toHaveTextContent('initial code');
+
+    await fireEvent.update(textarea, 'some code');
+
+    expect(preview).toHaveTextContent('some code');
+  });
+
+  test('emits input event', async () => {
+    const onInput = jest.fn();
+    const code = 'initialCode';
+    const inlineAttrs = `:value="code" @input="onInput"`;
+
+    renderComponent({
+      inlineAttrs,
+      methods: { onInput },
+      data: () => ({ code }),
     });
 
-    expect(wrapper.vm.content).toMatchInlineSnapshot(
-      `<code class="language-js"><span class="token function">log</span><span class="token punctuation">(</span><span class="token punctuation">)</span></code>`
+    const textarea = screen.getByTestId('textarea');
+    const preview = screen.getByTestId('preview');
+
+    expect(preview).toHaveTextContent('initialCode');
+
+    await fireEvent.update(textarea, 'some code');
+
+    expect(onInput).toHaveBeenCalledWith('some code');
+  });
+
+  test('emits keydown event', async () => {
+    const onKeydown = jest.fn(e => {
+      e.preventDefault();
+    });
+    const code = 'initialCode';
+    const inlineAttrs = `v-model="code" @keydown="onKeydown"`;
+
+    renderComponent({
+      inlineAttrs,
+      methods: { onKeydown },
+      data: () => ({ code }),
+    });
+
+    const textarea = screen.getByTestId('textarea');
+    const preview = screen.getByTestId('preview');
+
+    expect(preview).toHaveTextContent('initialCode');
+    await fireEvent.keyDown(textarea, { key: 'A', code: 'KeyA' });
+
+    expect(onKeydown).toHaveBeenCalledTimes(1);
+  });
+
+  test('toggle line numbers', async () => {
+    const code = 'initial code';
+
+    const { asFragment } = renderComponent({
+      data: () => ({ code, showLineNumbers: true }),
+      template: `
+      <div>
+        <Editor :highlight="highlight" :line-numbers="showLineNumbers" v-model="code"></Editor>
+        <button data-testid="btn" @click="showLineNumbers = false">toggle linenumbers</button>
+      </div>
+      `,
+    });
+
+    expect(asFragment()).toMatchSnapshot();
+
+    await fireEvent.click(screen.getByTestId('btn'));
+
+    expect(asFragment()).toMatchSnapshot();
+  });
+
+  test('use tab instead of spaces', async () => {
+    const onKeydown = jest.fn();
+    const code = `<template>`;
+    const inlineAttrs = `v-model="code" @keydown="onKeydown" :insert-spaces="false"`;
+
+    renderComponent({
+      inlineAttrs,
+      methods: { onKeydown },
+      data: () => ({ code }),
+    });
+
+    const textarea = screen.getByTestId('textarea');
+
+    await fireEvent.change(textarea, {
+      target: { selectionStart: 0, selectionEnd: 0 }, // space before line1
+    });
+
+    //tab
+    await fireEvent.keyDown(textarea, { keyCode: 9 });
+    expect(textarea.value).toBe(`\t\t<template>`);
+  });
+
+  test('emits keyup event', async () => {
+    const onKeyUp = jest.fn();
+    const code = 'initialCode';
+    const inlineAttrs = `v-model="code" @keyup="onKeyUp"`;
+
+    renderComponent({
+      inlineAttrs,
+      methods: { onKeyUp },
+      data: () => ({ code }),
+    });
+
+    const textarea = screen.getByTestId('textarea');
+    const preview = screen.getByTestId('preview');
+
+    expect(preview).toHaveTextContent('initialCode');
+    await fireEvent.keyUp(textarea, { key: 'A', code: 'KeyA' });
+
+    expect(onKeyUp).toHaveBeenCalledTimes(1);
+  });
+
+  test('emits focus and blur events', async () => {
+    const onFocus = jest.fn();
+    const onBlur = jest.fn();
+    const code = 'initialCode';
+    const inlineAttrs = `v-model="code" @focus="onFocus"  @blur="onBlur"`;
+
+    renderComponent({
+      inlineAttrs,
+      methods: { onFocus, onBlur },
+      data: () => ({ code }),
+    });
+
+    const textarea = screen.getByTestId('textarea');
+
+    await fireEvent.focus(textarea);
+    expect(onFocus).toHaveBeenCalledTimes(1);
+
+    await fireEvent.blur(textarea);
+    expect(onBlur).toHaveBeenCalledTimes(1);
+
+    await fireEvent.keyDown(textarea, { keyCode: 27 }); // escape calls blur
+    expect(onBlur).toHaveBeenCalledTimes(2);
+  });
+
+  test('tab and shift tab', async () => {
+    const onKeydown = jest.fn();
+    const code = `
+      <template>
+        line 1
+        line 2
+      </template>
+    `.trim();
+    const inlineAttrs = `v-model="code" @keydown="onKeydown"`;
+
+    renderComponent({
+      inlineAttrs,
+      methods: { onKeydown },
+      data: () => ({ code }),
+    });
+
+    const textarea = screen.getByTestId('textarea');
+
+    await fireEvent.change(textarea, {
+      target: { selectionStart: 11, selectionEnd: 14 }, // line 2
+    });
+
+    // shift tab
+    await fireEvent.keyDown(textarea, { keyCode: 9, shiftKey: true });
+    expect(textarea.value).toBe(
+      `
+      <template>
+      line 1
+        line 2
+      </template>
+    `.trim()
     );
+
+    // tab
+    await fireEvent.change(textarea, {
+      target: { selectionStart: 11, selectionEnd: 14 },
+    });
+    await fireEvent.keyDown(textarea, { keyCode: 9, shiftKey: false });
+    expect(textarea.value).toBe(
+      `
+      <template>
+        line 1
+        line 2
+      </template>
+    `.trim()
+    );
+  });
+
+  test('backspace removes tab or 2{tabwidth} spaces', async () => {
+    const onKeydown = jest.fn();
+    const code = `
+      <template>
+        line 1
+        line 2
+      </template>
+    `.trim();
+    const inlineAttrs = `v-model="code" @keydown="onKeydown"`;
+
+    renderComponent({
+      inlineAttrs,
+      methods: { onKeydown },
+      data: () => ({ code }),
+    });
+
+    const textarea = screen.getByTestId('textarea');
+
+    await fireEvent.change(textarea, {
+      target: { selectionStart: 13, selectionEnd: 13 }, // space before line1
+    });
+
+    await fireEvent.keyDown(textarea, { keyCode: 8 });
+    expect(textarea.value).toBe(
+      `
+      <template>
+      line 1
+        line 2
+      </template>
+    `.trim()
+    );
+  });
+
+  test('enter preserves previous line tab width', async () => {
+    const onKeydown = jest.fn();
+    const code = `
+      <template>
+        line1
+        line 2
+      </template>`.trim();
+    const inlineAttrs = `v-model="code" @keydown="onKeydown"`;
+
+    renderComponent({
+      inlineAttrs,
+      methods: { onKeydown },
+      data: () => ({ code }),
+    });
+
+    const textarea = screen.getByTestId('textarea');
+
+    await fireEvent.change(textarea, {
+      target: { selectionStart: 22, selectionEnd: 22 }, // lin{cursor}e1
+    });
+
+    // shift tab
+    await fireEvent.keyDown(textarea, { keyCode: 13 });
+    expect(textarea.value).toBe(
+      `
+      <template>
+        lin
+        e1
+        line 2
+      </template>`.trim()
+    );
+  });
+
+  test('wrap selected text with {} [] () single and double quotes', async () => {
+    const onKeydown = jest.fn();
+    const code = `text`;
+    const inlineAttrs = `v-model="code" @keydown="onKeydown"`;
+
+    renderComponent({
+      inlineAttrs,
+      methods: { onKeydown },
+      data: () => ({ code }),
+    });
+
+    const textarea = screen.getByTestId('textarea');
+
+    // ()
+    await fireEvent.change(textarea, {
+      target: { selectionStart: 0, selectionEnd: 4 }, //
+    });
+    await fireEvent.keyDown(textarea, { keyCode: 57, shiftKey: true });
+    expect(textarea.value).toBe(`(text)`);
+
+    // ""
+    textarea.value = 'text';
+    await fireEvent.change(textarea, {
+      target: { selectionStart: 0, selectionEnd: 4 }, //
+    });
+    await fireEvent.keyDown(textarea, { keyCode: 222, shiftKey: true });
+    expect(textarea.value).toBe(`"text"`);
+
+    // ''
+    textarea.value = 'text';
+    await fireEvent.change(textarea, {
+      target: { selectionStart: 0, selectionEnd: 4 }, //
+    });
+    await fireEvent.keyDown(textarea, { keyCode: 222 });
+    expect(textarea.value).toBe(`'text'`);
+
+    // ``
+    textarea.value = 'text';
+    await fireEvent.change(textarea, {
+      target: { selectionStart: 0, selectionEnd: 4 }, //
+    });
+    await fireEvent.keyDown(textarea, { keyCode: 192 });
+    expect(textarea.value).toBe('`text`');
+
+    // []
+    textarea.value = 'text';
+    await fireEvent.change(textarea, {
+      target: { selectionStart: 0, selectionEnd: 4 }, //
+    });
+    await fireEvent.keyDown(textarea, { keyCode: 219 });
+    expect(textarea.value).toBe('[text]');
+
+    // {}
+    textarea.value = 'text';
+    await fireEvent.change(textarea, {
+      target: { selectionStart: 0, selectionEnd: 4 }, //
+    });
+    await fireEvent.keyDown(textarea, { keyCode: 219, shiftKey: true });
+    expect(textarea.value).toBe('{text}');
+  });
+
+  test('backspace removes tab or 2{tabwidth} spaces', async () => {
+    const onKeydown = jest.fn();
+    const code = `
+      <template>
+        line 1
+        line 2
+      </template>
+    `.trim();
+    const inlineAttrs = `v-model="code" @keydown="onKeydown"`;
+
+    renderComponent({
+      inlineAttrs,
+      methods: { onKeydown },
+      data: () => ({ code }),
+    });
+
+    const textarea = screen.getByTestId('textarea');
+
+    await fireEvent.change(textarea, {
+      target: { selectionStart: 13, selectionEnd: 13 }, // space before line1
+    });
+
+    await fireEvent.keyDown(textarea, { keyCode: 8 });
+    expect(textarea.value).toBe(
+      `
+      <template>
+      line 1
+        line 2
+      </template>
+    `.trim()
+    );
+  });
+
+  test('undo redo', async () => {
+    const onInput = jest.fn();
+    const code = 'undoredo';
+    const inlineAttrs = `:value="code" @input="onInput"`;
+
+    renderComponent({
+      inlineAttrs,
+      methods: { onInput },
+      data: () => ({ code }),
+    });
+
+    const textarea = screen.getByTestId('textarea');
+
+    // lets make a history
+    await fireEvent.input(textarea, {
+      target: { value: 'text2' },
+    });
+    await fireEvent.input(textarea, {
+      target: { value: 'text3' },
+    });
+
+    // undo
+    await fireEvent.keyDown(textarea, {
+      ctrlKey: true,
+      metaKey: true,
+      keyCode: 90,
+    });
+    expect(textarea.value).toBe('text2');
+    // redo
+    await fireEvent.keyDown(textarea, {
+      shiftKey: true,
+      ctrlKey: true,
+      metaKey: true,
+      keyCode: 90,
+    });
+    expect(textarea.value).toBe('text3');
   });
 });

@@ -1,12 +1,11 @@
 <template>
   <div id="app" class="min-h-screen">
-    <header class="header bg-white">
+    <header class="header">
       <div class="hero py-8 sm:pt-24 text-center">
         <div class="hero-text font-mono text-xl w-64 sm:w-full mx-auto">
           <h1 class="text-2xl">Vue Prism Code Editor</h1>
           <h3 class="font-normal text-xl mt-4">
-            A dead simple code editor with syntax highlighting and line numbers.
-            7kb/gz
+            A dead simple code editor with syntax highlighting and line numbers. 7kb/gz
           </h3>
         </div>
         <div class="hero-options my-8 w-64 max-w-sm sm:w-full mx-auto">
@@ -30,6 +29,7 @@
         class="my-editor"
         language="html"
         v-model="code"
+        :highlight="highlight"
         :line-numbers="lineNumbers"
         :readonly="readonly"
       ></Editor>
@@ -38,48 +38,51 @@
 </template>
 
 <script>
-/* global Prism */
-import "prismjs";
-import "./assets/editorstyle.css";
-// import "prismjs/themes/prism-tomorrow.css";
-import Editor from "./components/Editor.vue";
+import './assets/editorstyle.css';
+import Editor from './components/Editor.vue';
+import { highlight, languages } from 'prismjs/components/prism-core';
+import 'prismjs/components/prism-clike';
+import 'prismjs/components/prism-markup';
+import 'prismjs/components/prism-javascript';
+import 'prismjs/components/prism-css';
 
 export default {
-  name: "app",
+  name: 'app',
   components: {
-    Editor
+    Editor,
   },
   data: () => ({
     lineNumbers: true,
     readonly: false,
     /* eslint-disable */
-    code: `<template>
-  <div id="app">
-    <p>{{ message }}</p>
-    <input v-model="message">
-  </div>
-</template>
-<script>
-export default {
-  data:() => ({
-    message: 'Hello Vue!'
-  })
-}
-<\/script>
-<style>
-#app {
-  color: #2ecc71
-}
-</style>` /* eslint-enable */
+    code: require('./example.js').default /* eslint-enable */,
   }),
-  mounted() {
-    console.log(Prism);
-  }
+  methods: {
+    highlight(code) {
+      return highlight(
+        code,
+        {
+          ...languages['markup'],
+          ...languages['js'],
+          ...languages['css'],
+        },
+        'markup'
+      );
+    },
+  },
 };
 </script>
 
 <style>
+.prism-editor__textarea:focus {
+  outline: none;
+}
 .my-editor {
-  max-height: 378px;
+  background-color: #fafafa;
+  max-height: 400px;
+  font-family: Fira code, Fira Mono, Consolas, Menlo, Courier, monospace;
+  font-size: 14px;
+  line-height: 1.5;
+  padding: 5px 10px;
 }
 </style>

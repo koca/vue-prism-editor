@@ -1,7 +1,317 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`Editor.vue renders with null value 1`] = `
-<div class="prism-editor-wrapper">
-  <!----> <pre contenteditable="true" spellcheck="false" autocapitalize="off" autocomplete="off" autocorrect="off" data-gramm="false" class="prism-editor__code language-js"><code class="language-js"></code></pre>
-</div>
+exports[`Editor.vue linenumbers 1`] = `
+<DocumentFragment>
+  <div
+    class="prism-editor-wrapper"
+  >
+    <div
+      aria-hidden="true"
+      class="prism-editor__line-numbers"
+      style="min-height: 20px;"
+    >
+      <div
+        class="prism-editor__line-width-calc"
+        style="height: 0px; visibility: hidden; pointer-events: none;"
+      >
+        
+      999
+    
+      </div>
+       
+      <div
+        class="prism-editor__line-number token comment"
+      >
+        
+      1
+    
+      </div>
+    </div>
+     
+    <div
+      class="prism-editor__container"
+    >
+      <textarea
+        autocapitalize="off"
+        autocomplete="off"
+        autocorrect="off"
+        class="prism-editor__textarea"
+        data-gramm="false"
+        data-testid="textarea"
+        placeholder="WRITE IT DOWN"
+        spellcheck="false"
+      />
+       
+      <pre
+        class="prism-editor__editor"
+        data-testid="preview"
+      >
+        <span
+          class="customHighlighter"
+        >
+          initialCode
+        </span>
+        <br />
+      </pre>
+    </div>
+  </div>
+</DocumentFragment>
+`;
+
+exports[`Editor.vue prism higlight works 1`] = `
+<DocumentFragment>
+  <div
+    class="prism-editor-wrapper"
+  >
+    <!---->
+     
+    <div
+      class="prism-editor__container"
+    >
+      <textarea
+        autocapitalize="off"
+        autocomplete="off"
+        autocorrect="off"
+        class="prism-editor__textarea"
+        data-gramm="false"
+        data-testid="textarea"
+        placeholder="WRITE IT DOWN"
+        spellcheck="false"
+      />
+       
+      <pre
+        class="prism-editor__editor"
+        data-testid="preview"
+      >
+        <span
+          class="token tag"
+        >
+          <span
+            class="token tag"
+          >
+            <span
+              class="token punctuation"
+            >
+              &lt;
+            </span>
+            template
+          </span>
+          <span
+            class="token punctuation"
+          >
+            &gt;
+          </span>
+        </span>
+        <span
+          class="token tag"
+        >
+          <span
+            class="token tag"
+          >
+            <span
+              class="token punctuation"
+            >
+              &lt;
+            </span>
+            div
+          </span>
+          <span
+            class="token punctuation"
+          >
+            &gt;
+          </span>
+        </span>
+        hey
+        <span
+          class="token tag"
+        >
+          <span
+            class="token tag"
+          >
+            <span
+              class="token punctuation"
+            >
+              &lt;/
+            </span>
+            div
+          </span>
+          <span
+            class="token punctuation"
+          >
+            &gt;
+          </span>
+        </span>
+        <span
+          class="token tag"
+        >
+          <span
+            class="token tag"
+          >
+            <span
+              class="token punctuation"
+            >
+              &lt;/
+            </span>
+            template
+          </span>
+          <span
+            class="token punctuation"
+          >
+            &gt;
+          </span>
+        </span>
+        <br />
+      </pre>
+    </div>
+  </div>
+</DocumentFragment>
+`;
+
+exports[`Editor.vue renders with custom higlighter 1`] = `
+<DocumentFragment>
+  <div
+    class="prism-editor-wrapper"
+  >
+    <!---->
+     
+    <div
+      class="prism-editor__container"
+    >
+      <textarea
+        autocapitalize="off"
+        autocomplete="off"
+        autocorrect="off"
+        class="prism-editor__textarea"
+        data-gramm="false"
+        data-testid="textarea"
+        placeholder="WRITE IT DOWN"
+        spellcheck="false"
+      />
+       
+      <pre
+        class="prism-editor__editor"
+        data-testid="preview"
+      >
+        <span
+          class="customHighlighter"
+        >
+          initialCode
+        </span>
+        <br />
+      </pre>
+    </div>
+  </div>
+</DocumentFragment>
+`;
+
+exports[`Editor.vue toggle line numbers 1`] = `
+<DocumentFragment>
+  <div>
+    <div
+      class="prism-editor-wrapper"
+    >
+      <div
+        aria-hidden="true"
+        class="prism-editor__line-numbers"
+        style="min-height: 20px;"
+      >
+        <div
+          class="prism-editor__line-width-calc"
+          style="height: 0px; visibility: hidden; pointer-events: none;"
+        >
+          
+      999
+    
+        </div>
+         
+        <div
+          class="prism-editor__line-number token comment"
+        >
+          
+      1
+    
+        </div>
+      </div>
+       
+      <div
+        class="prism-editor__container"
+      >
+        <textarea
+          autocapitalize="off"
+          autocomplete="off"
+          autocorrect="off"
+          class="prism-editor__textarea"
+          data-gramm="false"
+          data-testid="textarea"
+          placeholder="WRITE IT DOWN"
+          spellcheck="false"
+        />
+         
+        <pre
+          class="prism-editor__editor"
+          data-testid="preview"
+        >
+          <span
+            class="customHighlighter"
+          >
+            initial code
+          </span>
+          <br />
+        </pre>
+      </div>
+    </div>
+     
+    <button
+      data-testid="btn"
+    >
+      toggle linenumbers
+    </button>
+  </div>
+</DocumentFragment>
+`;
+
+exports[`Editor.vue toggle line numbers 2`] = `
+<DocumentFragment>
+  <div>
+    <div
+      class="prism-editor-wrapper"
+    >
+      <!---->
+       
+      <div
+        class="prism-editor__container"
+      >
+        <textarea
+          autocapitalize="off"
+          autocomplete="off"
+          autocorrect="off"
+          class="prism-editor__textarea"
+          data-gramm="false"
+          data-testid="textarea"
+          placeholder="WRITE IT DOWN"
+          spellcheck="false"
+        />
+         
+        <pre
+          class="prism-editor__editor"
+          data-testid="preview"
+          style="border-top-left-radius: 0; border-bottom-left-radius: 0;"
+        >
+          <span
+            class="customHighlighter"
+          >
+            initial code
+          </span>
+          <br />
+        </pre>
+      </div>
+    </div>
+     
+    <button
+      data-testid="btn"
+    >
+      toggle linenumbers
+    </button>
+  </div>
+</DocumentFragment>
 `;

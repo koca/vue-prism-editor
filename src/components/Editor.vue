@@ -20,87 +20,122 @@
         {{ line }}
       </div>
     </div>
-    <pre
-      class="prism-editor__code"
-      :class="{ ['language-' + language]: true }"
-      ref="pre"
-      v-html="content"
-      :contenteditable="!readonly"
-      @keydown="handleKeyDown"
-      @keyup="handleKeyUp"
-      @click="handleClick"
-      spellCheck="false"
-      autocapitalize="off"
-      autocomplete="off"
-      autocorrect="off"
-      data-gramm="false"
-      v-on="$listeners"
-    ></pre>
+    <div class="prism-editor__container">
+      <textarea
+        class="prism-editor__textarea"
+        :class="{ 'prism-editor__textarea--empty': isEmpty }"
+        @input="handleChange"
+        @keydown="handleKeyDown"
+        @keyup="$emit('keyup', $event)"
+        @focus="$emit('focus', $event)"
+        @blur="$emit('blur', $event)"
+        spellCheck="false"
+        autocapitalize="off"
+        autocomplete="off"
+        autocorrect="off"
+        data-gramm="false"
+        placeholder="WRITE IT DOWN"
+        data-testid="textarea"
+        :value="codeData"
+        ref="textarea"
+        :readonly="readonly"
+      ></textarea>
+      <pre class="prism-editor__editor" v-html="content" data-testid="preview" ref="pre"></pre>
+    </div>
   </div>
 </template>
 
 <script>
-import prism from "../utils/prism";
-import escapeHtml from "escape-html";
-import normalizeHtml from "../utils/normalizeHtml.js";
-import htmlToPlain from "../utils/htmlToPlain.js";
-import selectionRange from "../utils/selection-range.js";
-import { getIndent, getDeindentLevel } from "../utils/getIndent";
-import { FORBIDDEN_KEYS } from "../utils/constant";
+import './styles.css';
+
+const KEYCODE_ENTER = 13;
+const KEYCODE_TAB = 9;
+const KEYCODE_BACKSPACE = 8;
+const KEYCODE_Y = 89;
+const KEYCODE_Z = 90;
+const KEYCODE_M = 77;
+const KEYCODE_PARENS = 57;
+const KEYCODE_BRACKETS = 219;
+const KEYCODE_QUOTE = 222;
+const KEYCODE_BACK_QUOTE = 192;
+const KEYCODE_ESCAPE = 27;
+
+const HISTORY_LIMIT = 100;
+const HISTORY_TIME_GAP = 3000;
+
+const isWindows = 'navigator' in global && /Win/i.test(navigator.platform);
+const isMacLike = 'navigator' in global && /(Mac|iPhone|iPod|iPad)/i.test(navigator.platform);
 
 export default {
-  model: {
-    prop: "code",
-    event: "change"
-  },
   props: {
     emitEvents: {
       type: Boolean,
-      default: false
+      default: false,
     },
     language: {
       type: String,
-      default: "js"
+      default: 'js',
     },
     lineNumbers: {
       type: Boolean,
-      default: false
+      default: false,
     },
     autoStyleLineNumbers: {
       type: Boolean,
-      default: true
+      default: true,
     },
     readonly: {
       type: Boolean,
-      default: false
+      default: false,
     },
-    code: {
+    value: {
       type: String,
-      default: ""
-    }
+      default: '',
+    },
+    highlight: {
+      type: Function,
+      required: true,
+    },
+    tabSize: {
+      type: Number,
+      default: 2,
+    },
+    insertSpaces: {
+      type: Boolean,
+      default: true,
+    },
+    ignoreTabKey: {
+      type: Boolean,
+      default: false,
+    },
   },
   data() {
     return {
       undoStack: [],
+      capture: true,
+      history: {
+        stack: [],
+        offset: -1,
+      },
       selection: undefined,
-      lineNumbersHeight: "20px",
+      lineNumbersHeight: '20px',
       undoOffset: 0,
-      undoTimestamp: 0,
       lastPos: 0,
-      codeData: "",
-      composing: false
+      codeData: '',
+      composing: false,
+      internalValue: '',
     };
   },
   watch: {
-    code: {
+    value: {
       immediate: true,
       handler(newVal) {
         if (!newVal) {
-          this.codeData = "";
+          this.codeData = '';
         } else {
           this.codeData = newVal;
         }
-      }
+      },
     },
     content: {
       immediate: true,
@@ -110,67 +145,32 @@ export default {
             this.setLineNumbersHeight();
           });
         }
-      }
+      },
     },
     lineNumbers() {
       this.$nextTick(() => {
         this.styleLineNumbers();
         this.setLineNumbersHeight();
       });
-    }
+    },
   },
   computed: {
+    isEmpty() {
+      return this.codeData.length === 0;
+    },
     content() {
-      return prism(this.codeData || "", this.language);
+      const result = this.highlight(this.codeData, this.language) + '<br />';
+      // todo: VNode support?
+      return result;
     },
     lineNumbersCount() {
       let totalLines = this.codeData.split(/\r\n|\n/).length;
-      // TODO: Find a better way of doing this - ignore last line break (os spesific etc.)
-      if (this.codeData.endsWith("\n")) {
-        totalLines--;
-      }
       return totalLines;
-    }
-  },
-  updated() {
-    if (this.selection) {
-      selectionRange(this.$refs.pre, this.selection);
-    }
+    },
   },
   mounted() {
-    this.recordChange(this.getPlain());
-    this.undoTimestamp = 0; // Reset timestamp
+    this._recordCurrentState();
     this.styleLineNumbers();
-
-    const onPaste = e => {
-      e.preventDefault();
-      const currentCursorPos = selectionRange(this.$refs.pre);
-
-      // get text representation of clipboard
-      var text = (e.originalEvent || e).clipboardData.getData("Text");
-      // insert text manually
-      document.execCommand("insertHTML", false, escapeHtml(text));
-
-      const newCursorPos = currentCursorPos.end + text.length;
-      this.selection = { start: newCursorPos, end: newCursorPos };
-
-      const plain = this.getPlain();
-      this.recordChange(plain, this.selection);
-      this.updateContent(plain);
-      this.setLineNumbersHeight();
-    };
-    const $pre = this.$refs.pre;
-    $pre.addEventListener("paste", onPaste);
-    this.$once("hook:beforeDestroy", () => {
-      $pre.removeEventListener("paste", onPaste);
-    });
-    $pre.addEventListener("compositionstart", () => {
-      this.composing = true;
-    });
-    $pre.addEventListener("compositionend", () => {
-      // for canceling input.
-      this.composing = false;
-    });
   },
 
   methods: {
@@ -181,248 +181,386 @@ export default {
       if (!this.lineNumbers || !this.autoStyleLineNumbers) return;
 
       const $editor = this.$refs.pre;
-      const $lineNumbers = this.$el.querySelector(
-        ".prism-editor__line-numbers"
-      );
+      const $lineNumbers = this.$el.querySelector('.prism-editor__line-numbers');
       const editorStyles = window.getComputedStyle($editor);
 
       this.$nextTick(() => {
-        const btlr = "border-top-left-radius";
-        const bblr = "border-bottom-left-radius";
+        const btlr = 'border-top-left-radius';
+        const bblr = 'border-bottom-left-radius';
         $lineNumbers.style[btlr] = editorStyles[btlr];
         $lineNumbers.style[bblr] = editorStyles[bblr];
         $editor.style[btlr] = 0;
         $editor.style[bblr] = 0;
 
         const stylesList = [
-          "background-color",
-          "margin-top",
-          "padding-top",
-          "font-family",
-          "font-size",
-          "line-height"
+          'background-color',
+          'margin-top',
+          'padding-top',
+          'font-family',
+          'font-size',
+          'line-height',
         ];
         stylesList.forEach(style => {
           $lineNumbers.style[style] = editorStyles[style];
         });
-        $lineNumbers.style["margin-bottom"] = "-" + editorStyles["padding-top"];
+        $lineNumbers.style['margin-bottom'] = '-' + editorStyles['padding-top'];
       });
     },
-    handleClick(evt) {
-      if (this.emitEvents) {
-        this.$emit("editorClick", evt);
-      }
-      this.undoTimestamp = 0; // Reset timestamp
-      this.selection = selectionRange(this.$refs.pre);
-    },
-    getPlain() {
-      if (this._innerHTML === this.$refs.pre.innerHTML) {
-        return this._plain;
-      }
-      const plain = htmlToPlain(normalizeHtml(this.$refs.pre.innerHTML));
-      this._innerHTML = this.$refs.pre.innerHTML;
-      this._plain = plain;
+    _recordCurrentState() {
+      const input = this.$refs.textarea;
 
-      return this._plain;
+      if (!input) return;
+      // Save current state of the input
+      const { value, selectionStart, selectionEnd } = input;
+
+      this._recordChange({
+        value,
+        selectionStart,
+        selectionEnd,
+      });
     },
-    recordChange(plain, selection) {
-      if (plain === this.undoStack[this.undoStack.length - 1]) {
-        return;
+    _getLines(text, position) {
+      return text.substring(0, position).split('\n');
+    },
+    _applyEdits(record) {
+      // Save last selection state
+      const input = this.$refs.textarea;
+      const last = this.history.stack[this.history.offset];
+
+      if (last && input) {
+        this.history.stack[this.history.offset] = {
+          ...last,
+          selectionStart: input.selectionStart,
+          selectionEnd: input.selectionEnd,
+        };
       }
 
-      if (this.undoOffset > 0) {
-        this.undoStack = this.undoStack.slice(0, -this.undoOffset);
-        this.undoOffset = 0;
+      // Save the changes
+      this._recordChange(record);
+      this._updateInput(record);
+    },
+    _recordChange(record, overwrite = false) {
+      const { stack, offset } = this.history;
+
+      if (stack.length && offset > -1) {
+        // When something updates, drop the redo operations
+        this.history.stack = stack.slice(0, offset + 1);
+
+        // Limit the number of operations to 100
+        const count = this.history.stack.length;
+
+        if (count > HISTORY_LIMIT) {
+          const extras = count - HISTORY_LIMIT;
+
+          this.history.stack = stack.slice(extras, count);
+          this.history.offset = Math.max(this.history.offset - extras, 0);
+        }
       }
 
       const timestamp = Date.now();
-      const record = { plain, selection };
 
-      // Overwrite last record if threshold is not crossed
-      if (timestamp - this.undoTimestamp < 3000) {
-        this.undoStack[this.undoStack.length - 1] = record;
-      } else {
-        this.undoStack.push(record);
+      if (overwrite) {
+        const last = this.history.stack[this.history.offset];
 
-        if (this.undoStack.length > 50) {
-          this.undoStack.shift();
+        if (last && timestamp - last.timestamp < HISTORY_TIME_GAP) {
+          // A previous entry exists and was in short interval
+
+          // Match the last word in the line
+          const re = /[^a-z0-9]([a-z0-9]+)$/i;
+
+          // Get the previous line
+          const previous = this._getLines(last.value, last.selectionStart)
+            .pop()
+            .match(re);
+
+          // Get the current line
+          const current = this._getLines(record.value, record.selectionStart)
+            .pop()
+            .match(re);
+
+          if (previous && current && current[1].startsWith(previous[1])) {
+            // The last word of the previous line and current line match
+            // Overwrite previous entry so that undo will remove whole word
+            this.history.stack[this.history.offset] = {
+              ...record,
+              timestamp,
+            };
+
+            return;
+          }
         }
       }
 
-      this.undoTimestamp = timestamp;
+      // Add the new operation to the stack
+      this.history.stack.push({ ...record, timestamp });
+      this.history.offset++;
     },
-    updateContent(plain) {
-      this.$emit("change", plain);
-      this.$emit("update:code", plain);
+
+    _updateInput(record) {
+      const input = this.$refs.textarea;
+
+      if (!input) return;
+
+      // Update values and selection state
+      input.value = record.value;
+      input.selectionStart = record.selectionStart;
+      input.selectionEnd = record.selectionEnd;
+
+      this.$emit('input', record.value);
+      // this.props.onValueChange(record.value);
     },
-    restoreStackState(offset) {
-      const { plain, selection } = this.undoStack[
-        this.undoStack.length - 1 - offset
-      ];
+    handleChange(e) {
+      const { value, selectionStart, selectionEnd } = e.target;
 
-      this.selection = selection;
-      this.undoOffset = offset;
-      this.updateContent(plain);
+      this._recordChange(
+        {
+          value,
+          selectionStart,
+          selectionEnd,
+        },
+        true
+      );
+      this.$emit('input', value);
+      // this.props.onValueChange(value);
     },
-    undo() {
-      const offset = this.undoOffset + 1;
-      if (offset >= this.undoStack.length) {
-        return;
-      }
+    _undoEdit() {
+      const { stack, offset } = this.history;
 
-      this.restoreStackState(offset);
-    },
-    redo() {
-      const offset = this.undoOffset - 1;
-      if (offset < 0) {
-        return;
-      }
+      // Get the previous edit
+      const record = stack[offset - 1];
 
-      this.restoreStackState(offset);
-    },
-    handleKeyDown(evt) {
-      if (this.emitEvents) {
-        this.$emit("keydown", evt);
-      }
-
-      if (evt.keyCode === 9 && !this.ignoreTabKey) {
-        document.execCommand("insertHTML", false, "  ");
-        evt.preventDefault();
-      } else if (evt.keyCode === 8) {
-        // Backspace Key
-        const { start: cursorPos, end: cursorEndPos } = selectionRange(
-          this.$refs.pre
-        );
-        if (cursorPos !== cursorEndPos) {
-          return; // Bail on selections
-        }
-
-        const deindent = getDeindentLevel(this.$refs.pre.innerText, cursorPos);
-        if (deindent <= 0) {
-          return; // Bail when deindent level defaults to 0
-        }
-
-        // Delete chars `deindent` times
-        for (let i = 0; i < deindent; i++) {
-          document.execCommand("delete", false);
-        }
-
-        evt.preventDefault();
-      } else if (evt.keyCode === 13) {
-        // Enter Key
-        const { start: cursorPos } = selectionRange(this.$refs.pre);
-        const indentation = getIndent(this.$refs.pre.innerText, cursorPos);
-
-        // https://stackoverflow.com/questions/35585421
-        // add a space and remove it. it works :/
-        document.execCommand("insertHTML", false, "\n " + indentation);
-        document.execCommand("delete", false);
-
-        evt.preventDefault();
-      } else if (
-        // Undo / Redo
-        evt.keyCode === 90 &&
-        evt.metaKey !== evt.ctrlKey &&
-        !evt.altKey
-      ) {
-        if (evt.shiftKey) {
-          this.redo();
-        } else {
-          this.undo();
-        }
-
-        evt.preventDefault();
+      if (record) {
+        // Apply the changes and update the offset
+        this._updateInput(record);
+        this.history.offset = Math.max(offset - 1, 0);
       }
     },
-    handleKeyUp(evt) {
-      const keyupCode = evt.which;
-      if (this.composing) {
-        if (keyupCode === 13) {
-          // finish inputting via IM.
-          this.composing = false;
-        } else {
-          // now inputting words using IM.
-          // must not update view.
+    _redoEdit() {
+      const { stack, offset } = this.history;
+
+      // Get the next edit
+      const record = stack[offset + 1];
+
+      if (record) {
+        // Apply the changes and update the offset
+        this._updateInput(record);
+        this.history.offset = Math.min(offset + 1, stack.length - 1);
+      }
+    },
+    handleKeyDown(e) {
+      // console.log(navigator.platform);
+      const { tabSize, insertSpaces, ignoreTabKey } = this;
+
+      if (this.$listeners.keydown) {
+        // onKeyDown(e);
+        this.$emit('keydown', e);
+
+        if (e.defaultPrevented) {
           return;
         }
       }
 
-      if (!this.code) {
-        this.codeData = evt.target.innerText;
+      if (e.keyCode === KEYCODE_ESCAPE) {
+        e.target.blur();
+        this.$emit('blur', e);
       }
 
-      if (this.emitEvents) {
-        this.$emit("keyup", evt);
-      }
-      if (
-        evt.keyCode === 91 || // left cmd
-        evt.keyCode === 93 || // right cmd
-        evt.ctrlKey ||
-        evt.metaKey
+      const { value, selectionStart, selectionEnd } = e.target;
+
+      const tabCharacter = (insertSpaces ? ' ' : '\t').repeat(tabSize);
+
+      if (e.keyCode === KEYCODE_TAB && !ignoreTabKey && this.capture) {
+        // Prevent focus change
+        e.preventDefault();
+
+        if (e.shiftKey) {
+          // Unindent selected lines
+          const linesBeforeCaret = this._getLines(value, selectionStart);
+          const startLine = linesBeforeCaret.length - 1;
+          const endLine = this._getLines(value, selectionEnd).length - 1;
+          const nextValue = value
+            .split('\n')
+            .map((line, i) => {
+              if (i >= startLine && i <= endLine && line.startsWith(tabCharacter)) {
+                return line.substring(tabCharacter.length);
+              }
+
+              return line;
+            })
+            .join('\n');
+
+          if (value !== nextValue) {
+            const startLineText = linesBeforeCaret[startLine];
+
+            this._applyEdits({
+              value: nextValue,
+              // Move the start cursor if first line in selection was modified
+              // It was modified only if it started with a tab
+              selectionStart: startLineText.startsWith(tabCharacter)
+                ? selectionStart - tabCharacter.length
+                : selectionStart,
+              // Move the end cursor by total number of characters removed
+              selectionEnd: selectionEnd - (value.length - nextValue.length),
+            });
+          }
+        } else if (selectionStart !== selectionEnd) {
+          // Indent selected lines
+          const linesBeforeCaret = this._getLines(value, selectionStart);
+          const startLine = linesBeforeCaret.length - 1;
+          const endLine = this._getLines(value, selectionEnd).length - 1;
+          const startLineText = linesBeforeCaret[startLine];
+
+          this._applyEdits({
+            value: value
+              .split('\n')
+              .map((line, i) => {
+                if (i >= startLine && i <= endLine) {
+                  return tabCharacter + line;
+                }
+
+                return line;
+              })
+              .join('\n'),
+            // Move the start cursor by number of characters added in first line of selection
+            // Don't move it if it there was no text before cursor
+            selectionStart: /\S/.test(startLineText)
+              ? selectionStart + tabCharacter.length
+              : selectionStart,
+            // Move the end cursor by total number of characters added
+            selectionEnd: selectionEnd + tabCharacter.length * (endLine - startLine + 1),
+          });
+        } else {
+          const updatedSelection = selectionStart + tabCharacter.length;
+
+          this._applyEdits({
+            // Insert tab character at caret
+            value:
+              value.substring(0, selectionStart) + tabCharacter + value.substring(selectionEnd),
+            // Update caret position
+            selectionStart: updatedSelection,
+            selectionEnd: updatedSelection,
+          });
+        }
+      } else if (e.keyCode === KEYCODE_BACKSPACE) {
+        const hasSelection = selectionStart !== selectionEnd;
+        const textBeforeCaret = value.substring(0, selectionStart);
+
+        if (textBeforeCaret.endsWith(tabCharacter) && !hasSelection) {
+          // Prevent default delete behaviour
+          e.preventDefault();
+
+          const updatedSelection = selectionStart - tabCharacter.length;
+
+          this._applyEdits({
+            // Remove tab character at caret
+            value:
+              value.substring(0, selectionStart - tabCharacter.length) +
+              value.substring(selectionEnd),
+            // Update caret position
+            selectionStart: updatedSelection,
+            selectionEnd: updatedSelection,
+          });
+        }
+      } else if (e.keyCode === KEYCODE_ENTER) {
+        // Ignore selections
+        if (selectionStart === selectionEnd) {
+          // Get the current line
+          const line = this._getLines(value, selectionStart).pop();
+          const matches = line.match(/^\s+/);
+
+          if (matches && matches[0]) {
+            e.preventDefault();
+
+            // Preserve indentation on inserting a new line
+            const indent = '\n' + matches[0];
+            const updatedSelection = selectionStart + indent.length;
+
+            this._applyEdits({
+              // Insert indentation character at caret
+              value: value.substring(0, selectionStart) + indent + value.substring(selectionEnd),
+              // Update caret position
+              selectionStart: updatedSelection,
+              selectionEnd: updatedSelection,
+            });
+          }
+        }
+      } else if (
+        e.keyCode === KEYCODE_PARENS ||
+        e.keyCode === KEYCODE_BRACKETS ||
+        e.keyCode === KEYCODE_QUOTE ||
+        e.keyCode === KEYCODE_BACK_QUOTE
       ) {
-        return;
+        let chars;
+
+        if (e.keyCode === KEYCODE_PARENS && e.shiftKey) {
+          chars = ['(', ')'];
+        } else if (e.keyCode === KEYCODE_BRACKETS) {
+          if (e.shiftKey) {
+            chars = ['{', '}'];
+          } else {
+            chars = ['[', ']'];
+          }
+        } else if (e.keyCode === KEYCODE_QUOTE) {
+          if (e.shiftKey) {
+            chars = ['"', '"'];
+          } else {
+            chars = ["'", "'"];
+          }
+        } else if (e.keyCode === KEYCODE_BACK_QUOTE && !e.shiftKey) {
+          chars = ['`', '`'];
+        }
+
+        // console.log(isMacLike, "navigator" in global && /(Mac|iPhone|iPod|iPad)/i.test(navigator.platform));
+
+        // If text is selected, wrap them in the characters
+        if (selectionStart !== selectionEnd && chars) {
+          e.preventDefault();
+
+          this._applyEdits({
+            value:
+              value.substring(0, selectionStart) +
+              chars[0] +
+              value.substring(selectionStart, selectionEnd) +
+              chars[1] +
+              value.substring(selectionEnd),
+            // Update caret position
+            selectionStart,
+            selectionEnd: selectionEnd + 2,
+          });
+        }
+      } else if (
+        (isMacLike
+          ? // Trigger undo with ⌘+Z on Mac
+            e.metaKey && e.keyCode === KEYCODE_Z
+          : // Trigger undo with Ctrl+Z on other platforms
+            e.ctrlKey && e.keyCode === KEYCODE_Z) &&
+        !e.shiftKey &&
+        !e.altKey
+      ) {
+        e.preventDefault();
+
+        this._undoEdit();
+      } else if (
+        (isMacLike
+          ? // Trigger redo with ⌘+Shift+Z on Mac
+            e.metaKey && e.keyCode === KEYCODE_Z && e.shiftKey
+          : isWindows
+          ? // Trigger redo with Ctrl+Y on Windows
+            e.ctrlKey && e.keyCode === KEYCODE_Y
+          : // Trigger redo with Ctrl+Shift+Z on other platforms
+            e.ctrlKey && e.keyCode === KEYCODE_Z && e.shiftKey) &&
+        !e.altKey
+      ) {
+        e.preventDefault();
+
+        this._redoEdit();
+      } else if (e.keyCode === KEYCODE_M && e.ctrlKey && (isMacLike ? e.shiftKey : true)) {
+        e.preventDefault();
+
+        // Toggle capturing tab key so users can focus away
+        this.capture = !this.capture;
       }
-
-      // Enter key
-      if (evt.keyCode === 13) {
-        this.undoTimestamp = 0;
-      }
-
-      this.selection = selectionRange(this.$refs.pre);
-
-      if (!Object.values(FORBIDDEN_KEYS).includes(evt.keyCode)) {
-        const plain = this.getPlain();
-
-        this.recordChange(plain, this.selection);
-        this.updateContent(plain);
-      } else {
-        this.undoTimestamp = 0;
-      }
-    }
-  }
+    },
+  },
 };
 </script>
-
-<style>
-.prism-editor-wrapper code {
-  font-family: inherit;
-  line-height: inherit;
-}
-.prism-editor-wrapper {
-  /* position: absolute; */
-  width: 100%;
-  height: 100%;
-  display: flex;
-  align-items: flex-start;
-  overflow: auto;
-  tab-size: 1.5em;
-  -moz-tab-size: 1.5em;
-}
-.prism-editor__line-numbers {
-  height: 100%;
-  overflow: hidden;
-  flex-shrink: 0;
-  padding-top: 4px;
-  margin-top: 0;
-}
-.prism-editor__line-number {
-  /* padding: 0 3px 0 5px; */
-  text-align: right;
-  white-space: nowrap;
-}
-
-.prism-editor__code {
-  margin-top: 0 !important;
-  margin-bottom: 0 !important;
-  flex-grow: 2;
-  min-height: 100%;
-  box-sizing: border-box;
-  /* padding: 4px 2px 4px 8px; */
-  tab-size: 4;
-  -moz-tab-size: 4;
-  outline: none;
-}
-pre.prism-editor__code:focus {
-  outline: none;
-}
-</style>

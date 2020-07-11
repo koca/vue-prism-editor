@@ -6,6 +6,7 @@
     "vue-prism-editor": "1.0.0"
   },
   "changesets": [
+    "serious-experts-matter",
     "strange-zebras-repeat",
     "tender-numbers-beam"
   ]

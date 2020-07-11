@@ -1,12 +1,20 @@
 {
   "name": "root",
-  "description": "My new project",
+  "description": "A dead simple code editor with syntax highlighting and line numbers.",
+  "author": {
+    "name": "Mesut Koca",
+    "email": "imesutkoca@gmail.com"
+  },
   "version": "0.0.0",
-  "main": "index.js",
   "private": true,
   "workspaces": [
     "packages/*"
   ],
+  "husky": {
+    "hooks": {
+      "pre-commit": "eslint packages/"
+    }
+  },
   "scripts": {
     "bootstrap": "lerna bootstrap --use-workspaces",
     "example": "yarn workspace example serve",
@@ -27,6 +35,7 @@
     "eslint-plugin-prettier": "^3.0.0",
     "eslint-plugin-vue": "^6.2.2",
     "eslint-plugin-vue-libs": "^4.0.0",
+    "husky": "^4.2.5",
     "lerna": "^3.22.0",
     "prettier": "^2.0.5"
   }

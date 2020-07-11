@@ -27,6 +27,7 @@
     "test:cov": "yarn workspace vue-prism-editor test:cov"
   },
   "devDependencies": {
+    "@changesets/cli": "^2.9.2",
     "@typescript-eslint/eslint-plugin": "^3.0.0",
     "@typescript-eslint/parser": "^3.0.0",
     "babel-eslint": "^10.1.0",

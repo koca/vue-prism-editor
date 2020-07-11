@@ -1,0 +1,11 @@
+{
+  "mode": "pre",
+  "tag": "beta",
+  "initialVersions": {
+    "example": "0.1.0",
+    "vue-prism-editor": "1.0.0"
+  },
+  "changesets": [
+    "tender-numbers-beam"
+  ]
+}

@@ -1,19 +1,35 @@
 {
   "name": "vue-prism-editor",
-  "version": "0.1.0",
-  "author": "Mesut Koca",
+  "version": "1.0.0",
+  "description": "A dead simple code editor with syntax highlighting and line numbers.",
+  "author": {
+    "name": "Mesut Koca",
+    "email": "imesutkoca@gmail.com"
+  },
+  "homepage": "https://github.com/koca/vue-prism-editor#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/koca/vue-prism-editor.git"
+  },
+  "bugs": {
+    "url": "https://github.com/koca/vue-prism-editor/issues"
+  },
+  "keywords": [
+    "vue",
+    "editor",
+    "code editor",
+    "prism"
+  ],
+  "files": [
+    "dist",
+    "src"
+  ],
   "module": "dist/prismeditor.esm.js",
   "unpkg": "dist/prismeditor.umd.production.min.js",
   "umd:main": "dist/prismeditor.umd.production.min.js",
   "main": "dist/index.js",
   "typings": "dist/index.d.ts",
   "license": "MIT",
-  "files": [
-    "dist"
-  ],
-  "engines": {
-    "node": ">=10"
-  },
   "scripts": {
     "dev": "tsdx watch --format cjs --name PrismEditor",
     "build": "tsdx build --format cjs,esm,umd --name PrismEditor",
@@ -39,5 +55,8 @@
   "peerDependencies": {},
   "dependencies": {
     "vue": "^2.6.11"
+  },
+  "engines": {
+    "node": ">=10"
   }
 }

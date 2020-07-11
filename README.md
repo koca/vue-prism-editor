@@ -2,42 +2,43 @@
 
 <p align="center">
 
-
 ![version](https://img.shields.io/npm/v/vue-prism-editor.svg)
 ![npm bundle size (minified + gzip)](https://img.shields.io/bundlephobia/minzip/vue-prism-editor.svg)
 [![GitHub](https://img.shields.io/github/license/mashape/apistatus.svg)](https://github.com/koca/vue-prism-editor)
 [![CircleCI branch](https://circleci.com/gh/koca/vue-prism-editor/tree/master.svg?style=shield)](https://circleci.com/gh/koca/vue-prism-editor/tree/master)
+
 <!-- ![Codecov](https://img.shields.io/codecov/c/github/koca/vue-prism-editor.svg) -->
 
 </p>
 
-> A dead simple code editor with syntax highlighting and line numbers. 7kb/gz
+> A dead simple code editor with syntax highlighting and line numbers. 3kb/z
 
 ## Demo
 
 [prism-editor.netlify.com](https://prism-editor.netlify.com/)
 
 ## Examples
-  
- * Codesandbox: [https://codesandbox.io/s/61yrlnlnmn](https://codesandbox.io/s/61yrlnlnmn)
- * Codepen: [https://codepen.io/koca/pen/QVgqyR](https://codepen.io/koca/pen/QVgqyR)
+
+- Codesandbox: [https://codesandbox.io/s/61yrlnlnmn](https://codesandbox.io/s/61yrlnlnmn)
+- Codepen: [https://codepen.io/koca/pen/QVgqyR](https://codepen.io/koca/pen/QVgqyR)
 
 ## Features
 
-- Code Editing ^^
-- Syntax highlighting
-- Undo / Redo
-- Copy / Paste
-- The spaces/tabs of the previous line is preserved when a new line is added
-- Works on mobile (thanks to contenteditable)
-- Resize to parent width and height <sup>new</sup>
-- Support for line numbers <sup>new</sup>
-- Support for autosizing the editor <sup>new</sup>
-- Autostyling the linenumbers(optional) <sup>new</sup>
+- Code Editing
+- Modular syntax highlighting with third party library (not limited to prismjs)
+- Indent line or selected text by pressing tab key, with customizable indentation
+- Automatic indent on new lines
+- Wrap selected text in parens, brackets, or quotes
+- Undo / Redo whole words instead of letter by letter
+- Accessible, use Ctrl+Shift+M (Mac) / Ctrl+M to toggle capturing tab key
+- Works on mobile (thanks to textarea)
+- Auto resize
+- Line numbers
+- Match line numbers styles to the theme(optional)
 
 ## Use Case
 
-The goal of this project is to have a simple code editor. You can use to make small changes of some content or you just need a textarea with syntax highlighting. That's what it's good for. If you need an advanced code editor use Codemirror or Monaco Editor.
+Several browser based code editors such as Ace, CodeMirror, Monaco etc. provide the ability to embed a full-featured code editor in your web page. However, if you just need a simple editor with syntax highlighting without any of the extra features, they can be overkill as they don't usually have a small bundle size footprint. This library aims to provide a simple code editor with syntax highlighting support without any of the extra features, perfect for simple embeds and forms where users can submit code.
 
 ## Install
 
@@ -53,29 +54,48 @@ yarn add vue-prism-editor
 
 ## Usage
 
+You need to use the editor with a third party library which provides syntax highlighting. For example, it'll look like following with prismjs:
+
 Register the component locally and use it (recommended)
 
 ```html
 <template>
-  <prism-editor :code="code" language="js"></prism-editor>
+  <prism-editor v-model="code" :highlight="highlighter" line-numbers></prism-editor>
 </template>
 
 <script>
-import PrismEditor from 'vue-prism-editor'
-export default {
-  components: {
-    PrismEditor
-  }
-}
+  // import Prism Editor
+  import { PrismEditor } from 'vue-prism-editor';
+  import 'vue-prism-editor/dist/prismeditor.min.css'; // import the styles somewhere
+
+  // import highlighting library (you can use any library you want just return html string)
+  import { highlight, languages } from 'prismjs/components/prism-core';
+  import 'prismjs/components/prism-clike';
+  import 'prismjs/components/prism-javascript';
+  import "prismjs/themes/prism-tomorrow.css" // import syntax highlighting styles
+
+  export default {
+    components: {
+      PrismEditor,
+    },
+    data: () => ({ code: 'console.log("Hello World")' }),
+    methods: {
+      highlighter(code) {
+        return highlight(code, languages.js); //returns html
+      },
+    },
+  };
 </script>
 ```
 
-Or register the component globally in `main.js`
+> Note that depending on your syntax highlighter, you might have to include additional CSS for syntax highlighting to work.
+
+Or register the component globally
 
 ```js
-import VuePrismEditor from "vue-prism-editor";
-import "vue-prism-editor/dist/VuePrismEditor.css"; // import the styles
-Vue.component("prism-editor", VuePrismEditor);
+import { PrismEditor } from 'vue-prism-editor';
+import 'vue-prism-editor/dist/prismeditor.min.css'; // import the styles
+Vue.component('PrismEditor', PrismEditor);
 ```
 
 Browser usage:
@@ -85,63 +105,62 @@ Browser usage:
 <script src="https://unpkg.com/vue-prism-editor"></script>
 
 <!-- vue-prism-editor CSS -->
-<link rel="stylesheet" href="https://unpkg.com/vue-prism-editor/dist/VuePrismEditor.css">
+<link rel="stylesheet" href="https://unpkg.com/vue-prism-editor/dist/prismeditor.min.css" />
 
 <!-- use -->
 <script>
-Vue.component('vue-prism-editor', VuePrismEditor)
-new Vue({
-    el: '#app'
-})
+  Vue.component('PrismEditor', VuePrismEditor);
+  new Vue({
+    el: '#app',
+  });
 </script>
-```
-
-## Prismjs
-
-This package won't install Prismjs. If you use Prismjs already skip this step. If not you need to load Prismjs somewhere in your app:
-
-```js
-// yarn add prismjs
-import "prismjs";
-import "prismjs/themes/prism.css";
-```
-
-OR:
-
-```html
-<link rel="stylesheet" href="https://unpkg.com/prismjs/themes/prism.css" />
-<script src="https://unpkg.com/prismjs"></script>
 ```
 
 ## Props
 
-| Name                 | Type      | Default | Options                              | Description                                           |
-| -------------------- | --------- | ------- | ------------------------------------ | ----------------------------------------------------- |
-| v-model              | `string`  | -       | -                                    | for the `code` prop below                             |
-| code                 | `string`  | `""`    | -                                    | the code                                              |
-| language             | `String`  | `"js"`  | `vue,html,md,ts` + Prismjs Languages | language of the code                                  |
-| lineNumbers          | `Boolean` | `false` | -                                    | Whether to show line numbers or not                   |
-| readonly             | `Boolean` | `false` | -                                    | Indicates if the editor is read only or not.          |
-| emitEvents           | `Boolean` | `false` | -                                    | Indicates if the editor should emit events.           |
-| autoStyleLineNumbers | `Boolean` | `true`  | -                                    | Allow the line number to be styled by this component. |
+| Name                 | Type               | Default | Options | Description                                                                                                                                   |
+| -------------------- | ------------------ | ------- | ------- | --------------------------------------------------------------------------------------------------------------------------------------------- |
+| v-model `value`      | `string`           | `""`    | -       | Current value of the editor i.e. the code to display                                                                                          |
+| highlight            | `string => string` | -       | -       | Callback which will receive text to highlight. You'll need to return an HTML string with syntax highlighting using a library such as prismjs. |
+| lineNumbers          | `Boolean`          | `false` | -       | Whether to show line numbers                                                                                                                  |
+| readonly             | `Boolean`          | `false` | -       | Readonly                                                                                                                                      |
+| autoStyleLineNumbers | `Boolean`          | `true`  | -       | Match line numbers text color to the theme                                                                                                    |
 
 ## Events
 
-| Name   | Parameters | Description                     |
-| ------ | ---------- | ------------------------------- |
-| change | `(code)`   | Fires when the code is changed. |
+| Name    | Parameters | Description                                                  |
+| ------- | ---------- | ------------------------------------------------------------ |
+| input   | `(code)`   | Fires when the code is changed.                              |
+| keydown | `(event)`  | This event is emitted when a keydown event happens in editor |
+| keyup   | `(event)`  | This event is emitted when a keyup event happens in editor   |
+| click   | `(event)`  | This event is emitted when clicking anywhere in the editor   |
+| focus   | `(event)`  | This event is emitted when focus                             |
+| blur    | `(event)`  | This event is emitted when blur                              |
 
-The events below won't be fired unless you set the `emitEvents` prop to `true`.
 
-| Name         | Parameters | Description                                                                 |
-| ------------ | ---------- | --------------------------------------------------------------------------- |
-| keydown      | `(event)`  | This event is emitted when a keydown event happens in editor                |
-| keyup        | `(event)`  | This event is emitted when a keyup event happens in editor                  |
-| editor-click | `(event)`  | This event is emitted  when clicking anywhere in the contenteditable editor |
+## How it works
+
+_This part is taken from [react-simple-code-editor](https://github.com/satya164/react-simple-code-editor)_
+
+It works by overlaying a syntax highlighted `<pre>` block over a `<textarea>`. When you type, select, copy text etc., you interact with the underlying `<textarea>`, so the experience feels native. This is a very simple approach compared to other editors which re-implement the behaviour.
+
+The syntax highlighting can be done by any third party library as long as it returns HTML and is fully controllable by the user.
+
+The vanilla `<textarea>` doesn't support inserting tab characters for indentation, so we re-implement it by listening to `keydown` events and programmatically updating the text. One caveat with programmatically updating the text is that we lose the undo stack, so we need to maintain our own undo stack. As a result, we can also implement improved undo behaviour such as undoing whole words similar to editors like VSCode.
+
+## Limitations
+
+Due to the way it works, it has certain limitations:
+
+- The syntax highlighted code cannot have different font family, font weight, font style, line height etc. for its content. Since the editor works by aligning the highlighted code over a `<textarea>`, changing anything that affects the layout can misalign it.
+- The custom undo stack is incompatible with undo/redo items browser's context menu. However, other full featured editors don't support browser's undo/redo menu items either.
+- The editor is not optimized for performance and large documents can affect the typing speed.
+- We hide text in the textarea using `-webkit-text-fill-color: transparent`, which works in all modern browsers (even non-webkit ones such as Firefox and Edge). On IE 10+, we use `color: transparent` which doesn't hide the cursor. Text may appear bolder in unsupported browsers.
+
 
 ## Thanks
 
-inspired by [react-live](https://github.com/FormidableLabs/react-live).
+[react-simple-code-editor](https://github.com/satya164/react-simple-code-editor)
 
 ## License
 

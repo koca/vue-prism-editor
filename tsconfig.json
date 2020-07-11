@@ -1,0 +1,30 @@
+{
+    "extends": "./tsconfig.lib.json",
+    "include": [
+      "packages",
+    ],
+    "exclude": [
+      "node_modules",
+      "dist",
+      "__tests__",
+      "**/*.test*",
+      "**/*.spec*"
+    ],
+    "compilerOptions": {
+      "rootDir": "./",
+      "baseUrl": "./",
+      "outDir": "",
+      "allowJs": true,
+      "allowSyntheticDefaultImports": true,
+      "forceConsistentCasingInFileNames": true,
+      "resolveJsonModule": true,
+      "isolatedModules": true,
+      "noEmit": true
+    },
+    "references": [
+      {
+        "path": "./packages/vue-prism-editor"
+      },
+    ]
+  }
+  

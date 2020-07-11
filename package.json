@@ -1,82 +1,33 @@
 {
-  "name": "vue-prism-editor",
-  "version": "0.6.1",
+  "name": "root",
+  "description": "My new project",
+  "version": "0.0.0",
+  "main": "index.js",
+  "private": true,
+  "workspaces": [
+    "packages/*"
+  ],
   "scripts": {
-    "dev": "vue-cli-service serve",
-    "build:site": "vue-cli-service build --dest site",
-    "lint": "vue-cli-service lint",
-    "build": "vue-cli-service build --target lib --name VuePrismEditor ./src/components/Editor.js && rimraf dist/demo.html",
-    "test": "jest",
-    "test:watch": "jest --watchAll",
-    "test:cov": "jest --collectCoverage",
-    "publish-pkg": "npm run build && npm publish"
+    "bootstrap": "lerna bootstrap --use-workspaces",
+    "example": "yarn workspace example serve",
+    "build:example": "yarn workspace example build",
+    "build": "yarn workspace vue-prism-editor build",
+    "dev": "yarn workspace vue-prism-editor dev",
+    "lint": "eslint packages/",
+    "test": "yarn workspace vue-prism-editor test",
+    "test:watch": "yarn workspace vue-prism-editor test:watch",
+    "test:cov": "yarn workspace vue-prism-editor test:cov"
   },
-  "dependencies": {},
   "devDependencies": {
-    "@testing-library/jest-dom": "^5.10.1",
-    "@testing-library/user-event": "^12.0.2",
-    "@testing-library/vue": "^5.0.4",
-    "@vue/cli-plugin-babel": "^4.4.4",
-    "@vue/cli-plugin-unit-jest": "^4.4.4",
-    "@vue/cli-service": "^3.6.0",
-    "@vue/cli-plugin-eslint": "^3.6.0",
-    "@vue/eslint-config-prettier": "^4.0.1",
-    "@vue/test-utils": "^1.0.3",
-    "babel-core": "7.0.0-bridge.0",
-    "babel-jest": "^26.0.1",
-    "jest": "^26.0.1",
-    "jest-environment-jsdom-sixteen": "^1.0.3",
-    "lint-staged": "^8.1.5",
-    "prismjs": "^1.20.0",
-    "rimraf": "^2.6.3",
-    "tailwindcss": "^0.6.5",
-    "vue": "^2.6.11",
-    "vue-template-compiler": "^2.6.11"
-  },
-  "browserslist": [
-    "> 1%",
-    "last 2 versions",
-    "not ie <= 8"
-  ],
-  "unpkg": "dist/VuePrismEditor.umd.min.js",
-  "module": "dist/VuePrismEditor.common.js",
-  "main": "dist/VuePrismEditor.umd.js",
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/koca/vue-prism-editor.git"
-  },
-  "bugs": {
-    "url": "https://github.com/koca/vue-prism-editor/issues"
-  },
-  "homepage": "https://github.com/koca/vue-prism-editor#readme",
-  "license": "MIT",
-  "keywords": [
-    "vue",
-    "editor",
-    "code editor",
-    "prism"
-  ],
-  "description": "A dead simple code editor with syntax highlighting and line numbers.",
-  "author": {
-    "name": "Mesut Koca",
-    "email": "imesutkoca@gmail.com"
-  },
-  "gitHooks": {
-    "pre-commit": "lint-staged"
-  },
-  "lint-staged": {
-    "linters": {
-      "*.js": [
-        "vue-cli-service lint",
-        "git add"
-      ],
-      "*.vue": [
-        "vue-cli-service lint",
-        "git add"
-      ]
-    },
-    "ignore": [
-      "dist/*"
-    ]
+    "@typescript-eslint/eslint-plugin": "^3.0.0",
+    "@typescript-eslint/parser": "^3.0.0",
+    "babel-eslint": "^10.1.0",
+    "eslint": "^7.1.0",
+    "eslint-config-prettier": "^6.11.0",
+    "eslint-plugin-prettier": "^3.0.0",
+    "eslint-plugin-vue": "^6.2.2",
+    "eslint-plugin-vue-libs": "^4.0.0",
+    "lerna": "^3.22.0",
+    "prettier": "^2.0.5"
   }
 }

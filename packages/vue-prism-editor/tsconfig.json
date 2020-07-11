@@ -1,0 +1,11 @@
+{
+  "extends": "../../tsconfig.lib.json",
+  "files": ["../../typings.d.ts"],
+  "include": ["src", "types"],
+  "exclude": ["node_modules", "dist", "__tests__", "**/*.test*", "**/*.spec*"],
+  "compilerOptions": {
+    "rootDir": "./src",
+    "baseUrl": "./src",
+    "composite": true
+  }
+}

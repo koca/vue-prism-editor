@@ -72,7 +72,7 @@ Register the component locally and use it (recommended)
   import { highlight, languages } from 'prismjs/components/prism-core';
   import 'prismjs/components/prism-clike';
   import 'prismjs/components/prism-javascript';
-  import "prismjs/themes/prism-tomorrow.css" // import syntax highlighting styles
+  import 'prismjs/themes/prism-tomorrow.css'; // import syntax highlighting styles
 
   export default {
     components: {
@@ -88,23 +88,23 @@ Register the component locally and use it (recommended)
 </script>
 
 <style>
-// required class
-.my-editor {
-  // we dont use `language-` classes anymore so thats why we need to add background and text color manually
-  background: #2d2d2d;
-  color: #ccc; 
+  // required class
+  .my-editor {
+    // we dont use `language-` classes anymore so thats why we need to add background and text color manually
+    background: #2d2d2d;
+    color: #ccc;
 
-  // you must provide font-family font-size line-height. Example:
-  font-family: Fira code, Fira Mono, Consolas, Menlo, Courier, monospace;
-  font-size: 14px;
-  line-height: 1.5;
-  padding: 5px;
-}
+    // you must provide font-family font-size line-height. Example:
+    font-family: Fira code, Fira Mono, Consolas, Menlo, Courier, monospace;
+    font-size: 14px;
+    line-height: 1.5;
+    padding: 5px;
+  }
 
-// optional class for removing the outline
-.prism-editor__textarea:focus {
-  outline: none;
-}
+  // optional class for removing the outline
+  .prism-editor__textarea:focus {
+    outline: none;
+  }
 </style>
 ```
 
@@ -138,13 +138,16 @@ Browser usage:
 
 ## Props
 
-| Name                 | Type               | Default | Options | Description                                                                                                                                   |
-| -------------------- | ------------------ | ------- | ------- | --------------------------------------------------------------------------------------------------------------------------------------------- |
-| v-model `value`      | `string`           | `""`    | -       | Current value of the editor i.e. the code to display                                                                                          |
-| highlight            | `string => string` | -       | -       | Callback which will receive text to highlight. You'll need to return an HTML string with syntax highlighting using a library such as prismjs. |
-| lineNumbers          | `Boolean`          | `false` | -       | Whether to show line numbers                                                                                                                  |
-| readonly             | `Boolean`          | `false` | -       | Readonly                                                                                                                                      |
-| autoStyleLineNumbers | `Boolean`          | `true`  | -       | Match line numbers text color to the theme                                                                                                    |
+| Name                 | Type               | Default | Options | Description                                                                                                                                                  |
+| -------------------- | ------------------ | ------- | ------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| v-model `value`      | `string`           | `""`    | -       | Current value of the editor i.e. the code to display                                                                                                         |
+| highlight            | `string => string` | -       | -       | Callback which will receive text to highlight. You'll need to return an HTML string with syntax highlighting using a library such as prismjs.                |
+| readonly             | `Boolean`          | `false` | -       | Readonly                                                                                                                                                     |
+| lineNumbers          | `Boolean`          | `false` | -       | Whether to show line numbers. Default `false`                                                                                                                                |
+| autoStyleLineNumbers | `Boolean`          | `true`  | -       | Match line numbers text color to the theme. Default `true`                                                                                                                  |
+| tabSize              | `number`           | `2`       | -       | The number of characters to insert when pressing tab key. For example, for 4 space indentation, `tabSize` will be `4` and `insertSpaces` will be `true`. Default: `2` |
+| insertSpaces              | `boolean`           | `true`       | -       | Whether to use spaces for indentation. Default: `true`. If you set it to `false`, you might also want to set `tabSize` to `1` |
+| ignoreTabKey              | `boolean`           | `false`       | -       | Whether the editor should ignore tab key presses so that keyboard users can tab past the editor. Users can toggle this behaviour using `Ctrl+Shift+M` (Mac) / `Ctrl+M` manually when this is `false`. Default: `false` |
 
 ## Events
 
@@ -156,7 +159,6 @@ Browser usage:
 | click   | `(event)`  | This event is emitted when clicking anywhere in the editor   |
 | focus   | `(event)`  | This event is emitted when focus                             |
 | blur    | `(event)`  | This event is emitted when blur                              |
-
 
 ## How it works
 
@@ -176,7 +178,6 @@ Due to the way it works, it has certain limitations:
 - The custom undo stack is incompatible with undo/redo items browser's context menu. However, other full featured editors don't support browser's undo/redo menu items either.
 - The editor is not optimized for performance and large documents can affect the typing speed.
 - We hide text in the textarea using `-webkit-text-fill-color: transparent`, which works in all modern browsers (even non-webkit ones such as Firefox and Edge). On IE 10+, we use `color: transparent` which doesn't hide the cursor. Text may appear bolder in unsupported browsers.
-
 
 ## Thanks
 

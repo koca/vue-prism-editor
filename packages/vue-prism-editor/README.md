@@ -60,7 +60,7 @@ Register the component locally and use it (recommended)
 
 ```html
 <template>
-  <prism-editor v-model="code" :highlight="highlighter" line-numbers></prism-editor>
+  <prism-editor class="my-editor" v-model="code" :highlight="highlighter" line-numbers></prism-editor>
 </template>
 
 <script>

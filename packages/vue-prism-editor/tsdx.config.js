@@ -2,6 +2,7 @@
 const postcss = require('rollup-plugin-postcss');
 const autoprefixer = require('autoprefixer');
 const cssnano = require('cssnano');
+const nested = require('postcss-nested');
 const path = require('path');
 
 module.exports = {
@@ -12,6 +13,7 @@ module.exports = {
     config.plugins.push(
       postcss({
         plugins: [
+          nested(),
           autoprefixer(),
           cssnano({
             preset: 'default',

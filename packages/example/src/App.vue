@@ -5,7 +5,7 @@
         <div class="hero-text font-mono text-xl w-64 sm:w-full mx-auto">
           <h1 class="text-2xl">Vue Prism Code Editor</h1>
           <h3 class="font-normal text-xl mt-4">
-            A dead simple code editor with syntax highlighting and line numbers. 7kb/gz
+            A dead simple code editor with syntax highlighting and line numbers. 3kb/gz
           </h3>
         </div>
         <div class="hero-options my-8 w-64 max-w-sm sm:w-full mx-auto">

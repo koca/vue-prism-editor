@@ -1,15 +1,11 @@
 # Vue Prism Editor
 
-<p align="center">
-
-![version](https://img.shields.io/npm/v/vue-prism-editor.svg)
-![npm bundle size (minified + gzip)](https://img.shields.io/bundlephobia/minzip/vue-prism-editor.svg)
-[![GitHub](https://img.shields.io/github/license/mashape/apistatus.svg)](https://github.com/koca/vue-prism-editor)
-[![CircleCI branch](https://circleci.com/gh/koca/vue-prism-editor/tree/master.svg?style=shield)](https://circleci.com/gh/koca/vue-prism-editor/tree/master)
-
-<!-- ![Codecov](https://img.shields.io/codecov/c/github/koca/vue-prism-editor.svg) -->
-
-</p>
+[![Bundle size (minified + gzip)][bundle-size-badge]][bundle-size]
+[![NPM Downloads][downloads-badge]][downloads]
+[![Build Status][build-badge]][build]
+![Codecov][covarage-badge]
+[![Version][version-badge]][package]
+[![MIT License][license-badge]][license]
 
 > A dead simple code editor with syntax highlighting and line numbers. 3kb/z
 
@@ -186,3 +182,16 @@ Due to the way it works, it has certain limitations:
 ## License
 
 MIT
+
+[build-badge]: https://img.shields.io/circleci/project/github/koca/vue-prism-editor/master.svg?style=flat-square
+[build]: https://circleci.com/gh/koca/vue-prism-editor
+[downloads-badge]: https://img.shields.io/npm/dt/vue-prism-editor.svg?style=flat-square
+[downloads]: https://npmjs.com/package/vue-prism-editor
+[build-badge]: https://img.shields.io/npm/dm/vue-client-only.svg?style=flat
+[license-badge]: https://img.shields.io/npm/l/vue-prism-editor.svg?style=flat-square
+[license]: https://opensource.org/licenses/MIT
+[version-badge]: https://img.shields.io/npm/v/vue-prism-editor.svg?style=flat-square
+[package]: https://www.npmjs.com/package/vue-prism-editor
+[bundle-size-badge]: https://img.shields.io/bundlephobia/minzip/vue-prism-editor.svg?style=flat-square
+[bundle-size]: https://bundlephobia.com/result?p=vue-prism-editor
+[covarage-badge]: https://img.shields.io/codecov/c/github/koca/vue-prism-editor?style=flat-square

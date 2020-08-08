@@ -1,5 +1,13 @@
 # vue-prism-editor
 
+## 1.0.1
+
+### Patch Changes
+
+- 972c56b: update readme
+- bb7adc2: update readme
+- 57122d8: next version
+
 ## 1.0.1-beta.3
 
 ### Patch Changes

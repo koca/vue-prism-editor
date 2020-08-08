@@ -192,6 +192,6 @@ MIT
 [license]: https://opensource.org/licenses/MIT
 [version-badge]: https://img.shields.io/npm/v/vue-prism-editor.svg?style=flat-square
 [package]: https://www.npmjs.com/package/vue-prism-editor
-[bundle-size-badge]: https://img.shields.io/bundlephobia/minzip/vue-prism-editor.svg?style=flat-square
+[bundle-size-badge]: https://img.shields.io/bundlephobia/minzip/vue-prism-editor@1.x.x.svg?style=flat-square
 [bundle-size]: https://bundlephobia.com/result?p=vue-prism-editor
 [covarage-badge]: https://img.shields.io/codecov/c/github/koca/vue-prism-editor?style=flat-square

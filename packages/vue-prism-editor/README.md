@@ -9,6 +9,9 @@
 
 > A dead simple code editor with syntax highlighting and line numbers. 3kb/z
 
+![prism-editor](https://user-images.githubusercontent.com/342666/89706560-82f65380-d96f-11ea-94f9-e0fbf3220047.gif)
+
+
 ## Demo
 
 [prism-editor.netlify.com](https://prism-editor.netlify.com/)

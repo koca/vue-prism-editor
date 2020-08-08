@@ -1,5 +1,11 @@
 # vue-prism-editor
 
+## 1.0.1-beta.3
+
+### Patch Changes
+
+- Fix css specificity
+
 ## 1.0.1-beta.2
 
 ### Patch Changes

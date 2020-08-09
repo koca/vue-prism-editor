@@ -1,5 +1,11 @@
 # vue-prism-editor
 
+## 1.1.0
+
+### Minor Changes
+
+- fix: scrolling problem - text won't display past initial height
+
 ## 1.0.1
 
 ### Patch Changes

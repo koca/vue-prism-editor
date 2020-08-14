@@ -88,20 +88,20 @@ Register the component locally and use it (recommended)
 </script>
 
 <style>
-  // required class
+  /* required class */
   .my-editor {
-    // we dont use `language-` classes anymore so thats why we need to add background and text color manually
+    /* we dont use `language-` classes anymore so thats why we need to add background and text color manually */
     background: #2d2d2d;
     color: #ccc;
 
-    // you must provide font-family font-size line-height. Example:
+    /* you must provide font-family font-size line-height. Example: */
     font-family: Fira code, Fira Mono, Consolas, Menlo, Courier, monospace;
     font-size: 14px;
     line-height: 1.5;
     padding: 5px;
   }
 
-  // optional class for removing the outline
+  /* optional class for removing the outline */
   .prism-editor__textarea:focus {
     outline: none;
   }
@@ -118,21 +118,59 @@ import 'vue-prism-editor/dist/prismeditor.min.css'; // import the styles
 Vue.component('PrismEditor', PrismEditor);
 ```
 
-Browser usage:
+Browser usage (for codepen etc.):
 
 ```html
-<!-- vue-prism-editor JavaScript -->
-<script src="https://unpkg.com/vue-prism-editor"></script>
+<script src="https://unpkg.com/vue@2.6.*"></script>
 
-<!-- vue-prism-editor CSS -->
+<!-- Prism Editor -->
+<script src="https://unpkg.com/vue-prism-editor"></script>
 <link rel="stylesheet" href="https://unpkg.com/vue-prism-editor/dist/prismeditor.min.css" />
 
-<!-- use -->
+<!-- custom highlighter: -->
+<script src="https://unpkg.com/prismjs/prism.js"></script>
+<link rel="stylesheet" href="https://unpkg.com/prismjs/themes/prism-tomorrow.css" />
+
+<style>
+  .height-200{
+    height: 200px  
+  }
+  
+  .my-editor {
+    /* we dont use `language-` classes anymore so thats why we need to add background and text color manually */
+    background: #2d2d2d;
+    color: #ccc;
+
+    /* you must provide font-family font-size line-height. Example:*/
+    font-family: Fira code, Fira Mono, Consolas, Menlo, Courier, monospace;
+    font-size: 14px;
+    line-height: 1.5;
+    padding: 5px;
+  }
+
+  /* optional class for removing the outline */
+  .prism-editor__textarea:focus {
+    outline: none;
+  }
+</style>
+
+<div id="app">
+  <prism-editor class="my-editor height-200" v-model="code" :highlight="highlighter" line-numbers></prism-editor>
+</div>
+
 <script>
-  Vue.component('PrismEditor', VuePrismEditor);
   new Vue({
-    el: '#app',
-  });
+    el: "#app",
+    data: () => ({
+      code: "console.log('hello world')"
+    }),
+    methods: {
+      highlighter(code) {
+        // js highlight example
+        return Prism.highlight(code, Prism.languages.js, "js");
+      }
+    },
+  })
 </script>
 ```
 

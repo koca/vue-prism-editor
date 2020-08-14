@@ -1,5 +1,11 @@
 # vue-prism-editor
 
+## 1.2.1
+
+### Patch Changes
+
+- fix: fix #86 and auto register prism-editor when using umd bundle
+
 ## 1.2.0
 
 ### Minor Changes

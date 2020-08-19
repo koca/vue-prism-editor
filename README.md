@@ -81,7 +81,7 @@ Register the component locally and use it (recommended)
     data: () => ({ code: 'console.log("Hello World")' }),
     methods: {
       highlighter(code) {
-        return highlight(code, languages.js); //returns html
+        return highlight(code, languages.js); // languages.<insert language> to return html with markup
       },
     },
   };

@@ -1,4 +1,5 @@
-import Vue, { VNode } from 'vue';
+/* eslint-disable @typescript-eslint/explicit-module-boundary-types */
+import { defineComponent, h } from 'vue';
 
 import './styles.css';
 const KEYCODE_ENTER = 13;
@@ -41,7 +42,7 @@ export interface History {
   offset: number;
 }
 
-export const PrismEditor = Vue.extend({
+export const PrismEditor = defineComponent({
   props: {
     lineNumbers: {
       type: Boolean,
@@ -55,7 +56,7 @@ export const PrismEditor = Vue.extend({
       type: Boolean,
       default: false,
     },
-    value: {
+    modelValue: {
       type: String,
       default: '',
     },
@@ -92,7 +93,7 @@ export const PrismEditor = Vue.extend({
     };
   },
   watch: {
-    value: {
+    modelValue: {
       immediate: true,
       handler(newVal: string): void {
         if (!newVal) {
@@ -261,7 +262,7 @@ export const PrismEditor = Vue.extend({
       input.selectionStart = record.selectionStart;
       input.selectionEnd = record.selectionEnd;
 
-      this.$emit('input', record.value);
+      this.$emit('update:modelValue', record.value);
       // this.props.onValueChange(record.value);
     },
     handleChange(e: KeyboardEvent): void {
@@ -275,7 +276,7 @@ export const PrismEditor = Vue.extend({
         },
         true
       );
-      this.$emit('input', value);
+      this.$emit('update:modelValue', value);
       // this.props.onValueChange(value);
     },
     _undoEdit(): void {
@@ -306,13 +307,11 @@ export const PrismEditor = Vue.extend({
       // console.log(navigator.platform);
       const { tabSize, insertSpaces, ignoreTabKey } = this;
 
-      if (this.$listeners.keydown) {
-        // onKeyDown(e);
-        this.$emit('keydown', e);
+      // onKeyDown(e);
+      this.$emit('keydown', e);
 
-        if (e.defaultPrevented) {
-          return;
-        }
+      if (e.defaultPrevented) {
+        return;
       }
 
       if (e.keyCode === KEYCODE_ESCAPE) {
@@ -512,27 +511,23 @@ export const PrismEditor = Vue.extend({
       }
     },
   },
-  render(h): VNode {
+  render() {
     const lineNumberWidthCalculator = h(
       'div',
       {
-        attrs: {
-          class: 'prism-editor__line-width-calc',
-          style: 'height: 0px; visibility: hidden; pointer-events: none;',
-        },
+        class: 'prism-editor__line-width-calc',
+        style: 'height: 0px; visibility: hidden; pointer-events: none;',
       },
       '999'
     );
     const lineNumbers = h(
       'div',
       {
-        staticClass: 'prism-editor__line-numbers',
+        class: 'prism-editor__line-numbers',
         style: {
           'min-height': this.lineNumbersHeight,
         },
-        attrs: {
-          'aria-hidden': 'true',
-        },
+        'aria-hidden': 'true',
       },
       [
         lineNumberWidthCalculator,
@@ -544,51 +539,41 @@ export const PrismEditor = Vue.extend({
 
     const textarea = h('textarea', {
       ref: 'textarea',
-      on: {
-        input: this.handleChange,
-        keydown: this.handleKeyDown,
-        click: ($event: MouseEvent) => {
-          this.$emit('click', $event);
-        },
-        keyup: ($event: KeyboardEvent) => {
-          this.$emit('keyup', $event);
-        },
-        focus: ($event: FocusEvent) => {
-          this.$emit('focus', $event);
-        },
-        blur: ($event: FocusEvent) => {
-          this.$emit('blur', $event);
-        },
+      onInput: this.handleChange,
+      onKeydown: this.handleKeyDown,
+      onClick: ($event: MouseEvent) => {
+        this.$emit('click', $event);
       },
-      staticClass: 'prism-editor__textarea',
+      onKeyup: ($event: KeyboardEvent) => {
+        this.$emit('keyup', $event);
+      },
+      onFocus: ($event: FocusEvent) => {
+        this.$emit('focus', $event);
+      },
+      onBlur: ($event: FocusEvent) => {
+        this.$emit('blur', $event);
+      },
       class: {
+        'prism-editor__textarea': true,
         'prism-editor__textarea--empty': this.isEmpty,
       },
-      attrs: {
-        spellCheck: 'false',
-        autocapitalize: 'off',
-        autocomplete: 'off',
-        autocorrect: 'off',
-        'data-gramm': 'false',
-        placeholder: this.placeholder,
-        'data-testid': 'textarea',
-        readonly: this.readonly,
-      },
-      domProps: {
-        value: this.codeData,
-      },
+      spellCheck: 'false',
+      autocapitalize: 'off',
+      autocomplete: 'off',
+      autocorrect: 'off',
+      'data-gramm': 'false',
+      placeholder: this.placeholder,
+      'data-testid': 'textarea',
+      readonly: this.readonly,
+      value: this.codeData,
     });
     const preview = h('pre', {
       ref: 'pre',
-      staticClass: 'prism-editor__editor',
-      attrs: {
-        'data-testid': 'preview',
-      },
-      domProps: {
-        innerHTML: this.content,
-      },
+      class: 'prism-editor__editor',
+      'data-testid': 'preview',
+      innerHTML: this.content,
     });
-    const editorContainer = h('div', { staticClass: 'prism-editor__container' }, [textarea, preview]);
-    return h('div', { staticClass: 'prism-editor-wrapper' }, [this.lineNumbers && lineNumbers, editorContainer]);
+    const editorContainer = h('div', { class: 'prism-editor__container' }, [textarea, preview]);
+    return h('div', { class: 'prism-editor-wrapper' }, [this.lineNumbers && lineNumbers, editorContainer]);
   },
 });

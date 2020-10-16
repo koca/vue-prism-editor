@@ -532,7 +532,7 @@ export const PrismEditor = defineComponent({
       [
         lineNumberWidthCalculator,
         Array.from(Array(this.lineNumbersCount).keys()).map((_, index) => {
-          return h('div', { attrs: { class: 'prism-editor__line-number token comment' } }, `${++index}`);
+          return h('div', { class: 'prism-editor__line-number token comment' }, `${++index}`);
         }),
       ]
     );

@@ -6,6 +6,7 @@
     "vue-prism-editor": "1.2.2"
   },
   "changesets": [
-    "afraid-keys-jam"
+    "afraid-keys-jam",
+    "little-hairs-sip"
   ]
 }

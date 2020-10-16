@@ -1,5 +1,11 @@
 # vue-prism-editor
 
+## 2.0.0-alpha.1
+
+### Minor Changes
+
+- fix: linenumbers
+
 ## 2.0.0-alpha.0
 
 ### Major Changes

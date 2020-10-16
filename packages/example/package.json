@@ -10,13 +10,13 @@
     "core-js": "^3.6.4",
     "prismjs": "^1.20.0",
     "tailwindcss": "^1.4.6",
-    "vue": "^2.6.11",
+    "vue": "^3.0.0",
     "vue-prism-editor": "^1.2.2"
   },
   "devDependencies": {
-    "@vue/cli-plugin-babel": "~4.3.0",
-    "@vue/cli-service": "~4.3.0",
-    "vue-template-compiler": "^2.6.11"
+    "@vue/cli-plugin-babel": "~4.5.0",
+    "@vue/cli-service": "~4.5.0",
+    "@vue/compiler-sfc": "^3.0.1"
   },
   "browserslist": [
     "> 1%",

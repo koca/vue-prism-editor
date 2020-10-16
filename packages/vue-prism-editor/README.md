@@ -11,6 +11,8 @@
 
 ![prism-editor](https://user-images.githubusercontent.com/342666/89706560-82f65380-d96f-11ea-94f9-e0fbf3220047.gif)
 
+Editor works both for Vue 2.x and Vue 3.x and you are currently on the branch that supports Vue 3.x.
+[Go here for the Vue 2.x compatible version](https://github.com/koca/vue-prism-editor/)
 
 ## Demo
 
@@ -43,13 +45,13 @@ Several browser based code editors such as Ace, CodeMirror, Monaco etc. provide 
 ## Install
 
 ```sh
-npm install vue-prism-editor
+npm install vue-prism-editor@alpha
 ```
 
 or
 
 ```sh
-yarn add vue-prism-editor
+yarn add vue-prism-editor@alpha
 ```
 
 ## Usage
@@ -81,7 +83,7 @@ Register the component locally and use it (recommended)
     data: () => ({ code: 'console.log("Hello World")' }),
     methods: {
       highlighter(code) {
-        return highlight(code, languages.js); //returns html
+        return highlight(code, languages.js); // languages.<insert language> to return html with markup
       },
     },
   };

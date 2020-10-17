@@ -130,7 +130,7 @@ export const PrismEditor = defineComponent({
       return result;
     },
     lineNumbersCount(): number {
-      const totalLines = this.codeData.split(/\r\n|\n/).length;
+      const totalLines = this.codeData ? this.codeData.split(/\r\n|\n/).length : 0;
       return totalLines;
     },
   },

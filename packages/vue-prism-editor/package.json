@@ -1,6 +1,6 @@
 {
   "name": "vue-prism-editor",
-  "version": "1.2.2",
+  "version": "2.0.0-alpha.1",
   "description": "A dead simple code editor with syntax highlighting and line numbers.",
   "author": {
     "name": "Mesut Koca",

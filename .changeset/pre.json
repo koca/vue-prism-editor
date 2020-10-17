@@ -1,0 +1,12 @@
+{
+  "mode": "pre",
+  "tag": "alpha",
+  "initialVersions": {
+    "example": "0.1.0",
+    "vue-prism-editor": "1.2.2"
+  },
+  "changesets": [
+    "afraid-keys-jam",
+    "little-hairs-sip"
+  ]
+}

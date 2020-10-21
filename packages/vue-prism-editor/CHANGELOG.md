@@ -1,5 +1,11 @@
 # vue-prism-editor
 
+## 2.0.0-alpha.2
+
+### Minor Changes
+
+- fix: fix global var issue for vite
+
 ## 2.0.0-alpha.1
 
 ### Minor Changes

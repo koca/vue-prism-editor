@@ -22,6 +22,7 @@ Editor works both for Vue 2.x and Vue 3.x and you are currently on the branch th
 
 - Vue Example Codesandbox: [https://codesandbox.io/s/61yrlnlnmn](https://codesandbox.io/s/61yrlnlnmn)
 - Nuxt Example Codesandbox: [https://codesandbox.io/s/nuxt-vue-prism-editor-62e06](https://codesandbox.io/s/nuxt-vue-prism-editor-62e06)
+- Vite Example Codesandbox: [https://codesandbox.io/s/vite-vue-prism-editor-q9j8p](https://codesandbox.io/s/vite-vue-prism-editor-q9j8p)
 - Codepen: [https://codepen.io/koca/pen/QVgqyR](https://codepen.io/koca/pen/QVgqyR)
 
 ## Features

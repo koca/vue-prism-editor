@@ -17,8 +17,8 @@ const KEYCODE_ESCAPE = 27;
 const HISTORY_LIMIT = 100;
 const HISTORY_TIME_GAP = 3000;
 
-const isWindows = 'navigator' in global && /Win/i.test(navigator.platform);
-const isMacLike = 'navigator' in global && /(Mac|iPhone|iPod|iPad)/i.test(navigator.platform);
+const isWindows = typeof window !== 'undefined' && navigator && /Win/i.test(navigator.platform);
+const isMacLike = typeof window !== 'undefined' && navigator && /(Mac|iPhone|iPod|iPad)/i.test(navigator.platform);
 
 export interface EditorProps {
   lineNumbers: boolean;

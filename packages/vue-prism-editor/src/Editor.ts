@@ -589,16 +589,18 @@ export const PrismEditor = Vue.extend({
       },
     });
     const editorContainer = h('div', { staticClass: 'prism-editor__container' }, [textarea, preview]);
-    return h('div', {
-      on: {
-        click: () => {
-          const input = this.$refs.textarea as HTMLTextAreaElement
-          input.focus();
+    return h(
+      'div',
+      {
+        on: {
+          click: (): void => {
+            const input = this.$refs.textarea as HTMLTextAreaElement;
+            input.focus();
+          },
         },
+        staticClass: 'prism-editor-wrapper',
       },
-      staticClass: 'prism-editor-wrapper',
-    },
-    [this.lineNumbers && lineNumbers, editorContainer]
+      [this.lineNumbers && lineNumbers, editorContainer]
     );
   },
 });

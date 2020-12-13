@@ -278,6 +278,11 @@ export const PrismEditor = Vue.extend({
       this.$emit('input', value);
       // this.props.onValueChange(value);
     },
+    handleScroll(e: Event): void {
+      const editor = this.$refs.pre as HTMLTextAreaElement;
+
+      (this.$refs.textarea as HTMLTextAreaElement).scrollTop = editor.scrollTop;
+    },
     _undoEdit(): void {
       const { stack, offset } = this.history;
 
@@ -547,6 +552,7 @@ export const PrismEditor = Vue.extend({
       on: {
         input: this.handleChange,
         keydown: this.handleKeyDown,
+        scroll: this.handleScroll,
         click: ($event: MouseEvent) => {
           this.$emit('click', $event);
         },

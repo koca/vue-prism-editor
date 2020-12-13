@@ -7,11 +7,15 @@ const KEYCODE_BACKSPACE = 8;
 const KEYCODE_Y = 89;
 const KEYCODE_Z = 90;
 const KEYCODE_M = 77;
-const KEYCODE_PARENS = 57;
-const KEYCODE_BRACKETS = 219;
-const KEYCODE_QUOTE = 222;
-const KEYCODE_BACK_QUOTE = 192;
 const KEYCODE_ESCAPE = 27;
+
+const BRACKET_PAIRS: {[opening: string]: string} = {
+  '(':')',
+  '{':'}',
+  '[':']',
+  '"':'"',
+  "'":"'",
+};
 
 const HISTORY_LIMIT = 100;
 const HISTORY_TIME_GAP = 3000;
@@ -434,48 +438,21 @@ export const PrismEditor = Vue.extend({
             });
           }
         }
-      } else if (
-        e.keyCode === KEYCODE_PARENS ||
-        e.keyCode === KEYCODE_BRACKETS ||
-        e.keyCode === KEYCODE_QUOTE ||
-        e.keyCode === KEYCODE_BACK_QUOTE
-      ) {
-        let chars;
-
-        if (e.keyCode === KEYCODE_PARENS && e.shiftKey) {
-          chars = ['(', ')'];
-        } else if (e.keyCode === KEYCODE_BRACKETS) {
-          if (e.shiftKey) {
-            chars = ['{', '}'];
-          } else {
-            chars = ['[', ']'];
-          }
-        } else if (e.keyCode === KEYCODE_QUOTE) {
-          if (e.shiftKey) {
-            chars = ['"', '"'];
-          } else {
-            chars = ["'", "'"];
-          }
-        } else if (e.keyCode === KEYCODE_BACK_QUOTE && !e.shiftKey) {
-          chars = ['`', '`'];
-        }
-
-        // console.log(isMacLike, "navigator" in global && /(Mac|iPhone|iPod|iPad)/i.test(navigator.platform));
-
+      } else if (BRACKET_PAIRS[e.key]) {
         // If text is selected, wrap them in the characters
-        if (selectionStart !== selectionEnd && chars) {
+        if (selectionStart !== selectionEnd) {
           e.preventDefault();
 
           this._applyEdits({
             value:
               value.substring(0, selectionStart) +
-              chars[0] +
+              e.key +
               value.substring(selectionStart, selectionEnd) +
-              chars[1] +
+              BRACKET_PAIRS[e.key] +
               value.substring(selectionEnd),
             // Update caret position
-            selectionStart,
-            selectionEnd: selectionEnd + 2,
+            selectionStart: selectionStart + 1,
+            selectionEnd: selectionEnd + 1,
           });
         }
       } else if (

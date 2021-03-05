@@ -199,6 +199,7 @@ Browser usage (for codepen etc.):
 | keyup   | `(event)`  | This event is emitted when a keyup event happens in editor   |
 | click   | `(event)`  | This event is emitted when clicking anywhere in the editor   |
 | focus   | `(event)`  | This event is emitted when focus                             |
+| focusout| `(event)`  | This event is emitted when focuses out                       |
 | blur    | `(event)`  | This event is emitted when blur                              |
 
 ## How it works

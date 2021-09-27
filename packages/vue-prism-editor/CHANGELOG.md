@@ -1,5 +1,11 @@
 # vue-prism-editor
 
+## 1.3.0
+
+### Minor Changes
+
+- fix: remove global var for Vue 2 (#120) thanks @tillsanders !
+
 ## 1.2.2
 
 ### Patch Changes

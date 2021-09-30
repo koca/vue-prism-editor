@@ -17,6 +17,10 @@
             <input type="checkbox" name="ln" v-model="readonly" />
             Readonly
           </label>
+          <label for="ln" class="ml-4">
+            <input type="checkbox" name="ln" v-model="fixedHeight" />
+            Fixed Height
+          </label>
         </div>
         <div class="hero-info">
           Documentation on
@@ -26,7 +30,7 @@
     </header>
     <main class="main max-w-lg mx-auto my-0 p-0">
       <Editor
-        class="my-editor"
+        :class="editorClasses"
         language="html"
         v-model="code"
         :highlight="highlight"
@@ -56,9 +60,15 @@ export default {
   data: () => ({
     lineNumbers: true,
     readonly: false,
+    fixedHeight: false,
     /* eslint-disable */
     code: require('./example.js').default /* eslint-enable */,
   }),
+  computed: {
+    editorClasses() {
+      return this.fixedHeight ? 'my-editor set-height' : 'my-editor';
+    },
+  },
   methods: {
     highlight(code) {
       return highlight(
@@ -86,5 +96,8 @@ export default {
   font-size: 14px;
   line-height: 1.5;
   padding: 5px 10px;
+}
+.set-height {
+  height: 20em; /* 20 lines */
 }
 </style>

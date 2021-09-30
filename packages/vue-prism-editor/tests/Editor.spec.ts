@@ -228,15 +228,16 @@ describe('Editor', () => {
     expect(onKeyUp).toHaveBeenCalledTimes(1);
   });
 
-  test('emits focus and blur events', async () => {
+  test('emits focus, focusout and blur events', async () => {
     const onFocus = jest.fn();
+    const onFocusout = jest.fn();
     const onBlur = jest.fn();
     const code = 'initialCode';
-    const inlineAttrs = `v-model="code" @focus="onFocus"  @blur="onBlur"`;
+    const inlineAttrs = `v-model="code" @focus="onFocus"  @focusout="onFocusout" @blur="onBlur"`;
 
     renderComponent({
       inlineAttrs,
-      methods: { onFocus, onBlur },
+      methods: { onFocus, onFocusout, onBlur },
       data: () => ({ code }),
     });
 
@@ -244,6 +245,9 @@ describe('Editor', () => {
 
     await fireEvent.focus(textarea);
     expect(onFocus).toHaveBeenCalledTimes(1);
+
+    await fireEvent.focusOut(textarea);
+    expect(onFocusout).toHaveBeenCalledTimes(1);
 
     await fireEvent.blur(textarea);
     expect(onBlur).toHaveBeenCalledTimes(1);

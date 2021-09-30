@@ -556,6 +556,9 @@ export const PrismEditor = Vue.extend({
         focus: ($event: FocusEvent) => {
           this.$emit('focus', $event);
         },
+        focusout: ($event: FocusEvent) => {
+          this.$emit('focusout', $event);
+        },
         blur: ($event: FocusEvent) => {
           this.$emit('blur', $event);
         },

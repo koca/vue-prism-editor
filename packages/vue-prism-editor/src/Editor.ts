@@ -79,6 +79,10 @@ export const PrismEditor = Vue.extend({
       type: String,
       default: '',
     },
+    spellCheck: {
+      type: String,
+      default: 'false',
+    },
   },
   data() {
     return {
@@ -565,7 +569,7 @@ export const PrismEditor = Vue.extend({
         'prism-editor__textarea--empty': this.isEmpty,
       },
       attrs: {
-        spellCheck: 'false',
+        spellCheck: this.spellCheck,
         autocapitalize: 'off',
         autocomplete: 'off',
         autocorrect: 'off',

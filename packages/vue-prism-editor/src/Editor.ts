@@ -516,9 +516,13 @@ export const PrismEditor = Vue.extend({
     const lineNumberWidthCalculator = h(
       'div',
       {
+        style: {
+          'height': '0px',
+          'visibility': 'hidden',
+          'pointer-events': 'none',
+        },
         attrs: {
           class: 'prism-editor__line-width-calc',
-          style: 'height: 0px; visibility: hidden; pointer-events: none;',
         },
       },
       '999'

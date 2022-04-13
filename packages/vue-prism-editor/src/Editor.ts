@@ -185,6 +185,15 @@ export const PrismEditor = Vue.extend({
     _getLines(text: string, position: number): Array<string> {
       return text.substring(0, position).split('\n');
     },
+    _recordStateIfChange(): void {
+      if (this.history.stack[this.history.offset].value != this.codeData) {
+        this._recordChange({
+          value: this.codeData,
+          selectionStart: this.codeData.length,
+          selectionEnd: this.codeData.length,
+        });
+      }
+    },
     _applyEdits(record: Record): void {
       // Save last selection state
       const input = this.$refs.textarea as HTMLTextAreaElement;
@@ -531,6 +540,7 @@ export const PrismEditor = Vue.extend({
           this.$emit('keyup', $event);
         },
         focus: ($event: FocusEvent) => {
+          this._recordStateIfChange();
           this.$emit('focus', $event);
         },
         blur: ($event: FocusEvent) => {

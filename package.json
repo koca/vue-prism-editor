@@ -10,11 +10,6 @@
   "workspaces": [
     "packages/*"
   ],
-  "husky": {
-    "hooks": {
-      "pre-commit": "eslint packages/"
-    }
-  },
   "scripts": {
     "bootstrap": "lerna bootstrap --use-workspaces",
     "example": "yarn workspace example serve",

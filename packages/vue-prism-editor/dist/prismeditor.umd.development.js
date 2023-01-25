@@ -81,6 +81,12 @@
       placeholder: {
         type: String,
         "default": ''
+      },
+      autocomplete: {
+        type: Function,
+        "default": function _default() {
+          return [];
+        }
       }
     },
     data: function data() {
@@ -91,7 +97,10 @@
           offset: -1
         },
         lineNumbersHeight: '20px',
-        codeData: ''
+        codeData: '',
+        autocompleteOpen: false,
+        autocompleteIndex: 0,
+        autocompleteData: []
       };
     },
     watch: {
@@ -125,6 +134,17 @@
 
           _this2.setLineNumbersHeight();
         });
+      },
+      autocompleteIndex: function autocompleteIndex() {
+        var _this3 = this;
+
+        Vue.nextTick(function () {
+          var node = _this3.$el.querySelector('ul.prism-editor__autocomplete > li.selected');
+
+          if (node) node.scrollIntoView({
+            block: 'nearest'
+          });
+        });
       }
     },
     computed: {
@@ -139,6 +159,16 @@
       lineNumbersCount: function lineNumbersCount() {
         var totalLines = this.codeData.split(/\r\n|\n/).length;
         return totalLines;
+      },
+      cursorOffset: function cursorOffset() {
+        var text = this.codeData;
+        var input = this.$refs.textarea;
+        var wrapper = this.$refs.wrapper;
+        var lines = text.substring(0, input.selectionEnd || 0).split(/\r\n|\n/);
+        var font_size = parseFloat(getComputedStyle(input).getPropertyValue('font-size'));
+        var line = lines.length;
+        var column = lines[lines.length - 1].length;
+        return [Math.min(column * 8.85 * (font_size / 16) - wrapper.scrollLeft, wrapper.clientWidth - Math.min(240, wrapper.clientWidth)), line * 24.0 * (font_size / 16) + 2 - wrapper.scrollTop];
       }
     },
     mounted: function mounted() {
@@ -147,6 +177,53 @@
       this.styleLineNumbers();
     },
     methods: {
+      updateAutocompleteData: function updateAutocompleteData() {
+        var _this$autocompleteDat;
+
+        var input = this.$refs.textarea;
+        var data = typeof this.autocomplete == 'function' ? this.autocomplete(this.codeData, input.selectionEnd) : [];
+        var old_length = this.autocompleteData.length;
+
+        (_this$autocompleteDat = this.autocompleteData).splice.apply(_this$autocompleteDat, [0, Infinity].concat(data));
+
+        this.autocompleteOpen = true;
+        this.autocompleteIndex = Math.max(0, Math.min(this.autocompleteIndex, this.autocompleteData.length - 1));
+        if (old_length > this.autocompleteData.length) this.autocompleteIndex = 0;
+      },
+      acceptAutocomplete: function acceptAutocomplete(event, option) {
+        var _this4 = this;
+
+        event.preventDefault();
+        if (option == undefined) option = this.autocompleteIndex;
+        var input = this.$refs.textarea;
+        var wrapper = this.$refs.wrapper;
+        var suggestion = this.autocompleteData[option] || this.autocompleteData[0];
+        if (!suggestion) return;
+        var overlap = suggestion.overlap || 0;
+        var new_text = [this.codeData.substr(0, input.selectionEnd - overlap), suggestion.text, this.codeData.substring(input.selectionEnd)];
+        var result = new_text.join('');
+        var cursor_pos = input.selectionEnd - overlap + suggestion.text.length + (suggestion.text.endsWith(')') ? -1 : 0);
+        input.selectionStart = input.selectionEnd = cursor_pos;
+
+        this._applyEdits({
+          value: result,
+          selectionStart: cursor_pos,
+          selectionEnd: cursor_pos
+        });
+
+        var inserted_characters = suggestion.text.length - suggestion.overlap;
+        Vue.nextTick(function () {
+          wrapper.scrollLeft += inserted_characters * 8.85;
+        });
+
+        if (suggestion.text.endsWith('.')) {
+          setTimeout(function () {
+            _this4.updateAutocompleteData();
+          }, 1);
+        } else {
+          this.autocompleteOpen = false;
+        }
+      },
       setLineNumbersHeight: function setLineNumbersHeight() {
         this.lineNumbersHeight = getComputedStyle(this.$refs.pre).height;
       },
@@ -320,6 +397,8 @@
         }
       },
       handleKeyDown: function handleKeyDown(e) {
+        var _this5 = this;
+
         // console.log(navigator.platform);
         var tabSize = this.tabSize,
             insertSpaces = this.insertSpaces,
@@ -330,6 +409,36 @@
           this.$emit('keydown', e);
 
           if (e.defaultPrevented) {
+            return;
+          }
+        }
+
+        if (e.keyCode === 9 && this.autocompleteData.length && this.autocompleteOpen) {
+          this.acceptAutocomplete(e);
+          e.preventDefault();
+          e.stopPropagation();
+          return;
+        }
+
+        if (e.keyCode === 27) {
+          // Escape
+          if (this.autocompleteData.length && this.autocompleteOpen) {
+            e.preventDefault();
+            this.autocompleteOpen = false;
+            return;
+          }
+        } else if (e.keyCode === 38) {
+          // Up
+          if (this.autocompleteData.length && this.autocompleteOpen) {
+            e.preventDefault();
+            this.autocompleteIndex = (this.autocompleteIndex ? this.autocompleteIndex : this.autocompleteData.length) - 1;
+            return;
+          }
+        } else if (e.keyCode === 40) {
+          // Down
+          if (this.autocompleteData.length && this.autocompleteOpen) {
+            e.preventDefault();
+            this.autocompleteIndex = (this.autocompleteIndex + 1) % this.autocompleteData.length;
             return;
           }
         }
@@ -429,8 +538,9 @@
             });
           }
         } else if (e.keyCode === KEYCODE_ENTER) {
-          // Ignore selections
-          if (selectionStart === selectionEnd) {
+          if (this.autocompleteData.length && this.autocompleteOpen) {
+            this.acceptAutocomplete(e);
+          } else if (selectionStart === selectionEnd) {
             // Get the current line
             var line = this._getLines(value, selectionStart).pop();
 
@@ -482,10 +592,16 @@
 
           this.capture = !this.capture;
         }
+
+        if (e.keyCode !== 13 && e.keyCode !== 9) {
+          setTimeout(function () {
+            _this5.updateAutocompleteData();
+          }, 1);
+        }
       }
     },
     render: function render(h) {
-      var _this3 = this;
+      var _this6 = this;
 
       var lineNumberWidthCalculator = h('div', {
         attrs: {
@@ -508,24 +624,47 @@
           }
         }, "" + ++index);
       })]);
+      var autocompleteList = this.autocompleteOpen && this.autocompleteData.length ? h('ul', {
+        staticClass: 'prism-editor__autocomplete',
+        style: {
+          left: this.cursorOffset[0] + 'px',
+          top: this.cursorOffset[1] + 'px'
+        }
+      }, this.autocompleteData.map(function (data, i) {
+        return h('li', {
+          key: data.text,
+          "class": {
+            selected: i == _this6.autocompleteIndex
+          },
+          on: {
+            mousedown: function mousedown($event) {
+              _this6.acceptAutocomplete($event, i);
+            }
+          }
+        }, [data.label || data.text]);
+      })) : undefined;
       var textarea = h('textarea', {
         ref: 'textarea',
         on: {
           input: this.handleChange,
           keydown: this.handleKeyDown,
           click: function click($event) {
-            _this3.$emit('click', $event);
+            _this6.autocompleteOpen = false;
+
+            _this6.$emit('click', $event);
           },
           keyup: function keyup($event) {
-            _this3.$emit('keyup', $event);
+            _this6.$emit('keyup', $event);
           },
           focus: function focus($event) {
-            _this3._recordStateIfChange();
+            _this6._recordStateIfChange();
 
-            _this3.$emit('focus', $event);
+            _this6.$emit('focus', $event);
           },
           blur: function blur($event) {
-            _this3.$emit('blur', $event);
+            _this6.autocompleteOpen = false;
+
+            _this6.$emit('blur', $event);
           }
         },
         staticClass: 'prism-editor__textarea',
@@ -559,9 +698,13 @@
       var editorContainer = h('div', {
         staticClass: 'prism-editor__container'
       }, [textarea, preview]);
-      return h('div', {
-        staticClass: 'prism-editor-wrapper'
+      var wrapper = h('div', {
+        staticClass: 'prism-editor-wrapper',
+        ref: 'wrapper'
       }, [this.lineNumbers && lineNumbers, editorContainer]);
+      return h('div', {
+        staticClass: 'prism-editor-component'
+      }, [wrapper, autocompleteList]);
     }
   });
 

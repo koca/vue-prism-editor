@@ -22,12 +22,22 @@ export interface History {
     }>;
     offset: number;
 }
+interface AutocompleteEntry {
+    text: string;
+    overlap: number;
+    label?: string;
+}
 export declare const PrismEditor: import("vue/types/vue").ExtendedVue<Vue, {
     capture: boolean;
     history: History;
     lineNumbersHeight: string;
     codeData: string;
+    autocompleteOpen: boolean;
+    autocompleteIndex: number;
+    autocompleteData: AutocompleteEntry[];
 }, {
+    updateAutocompleteData(): void;
+    acceptAutocomplete(event: Event, option?: number | undefined): void;
     setLineNumbersHeight(): void;
     styleLineNumbers(): void;
     _recordCurrentState(): void;
@@ -44,6 +54,7 @@ export declare const PrismEditor: import("vue/types/vue").ExtendedVue<Vue, {
     isEmpty: boolean;
     content: string;
     lineNumbersCount: number;
+    cursorOffset: number[];
 }, {
     lineNumbers: boolean;
     autoStyleLineNumbers: boolean;
@@ -54,4 +65,6 @@ export declare const PrismEditor: import("vue/types/vue").ExtendedVue<Vue, {
     insertSpaces: boolean;
     ignoreTabKey: boolean;
     placeholder: string;
+    autocomplete: Function;
 }>;
+export {};

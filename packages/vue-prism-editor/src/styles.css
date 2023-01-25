@@ -1,11 +1,23 @@
+
+.prism-editor-component {
+	width: 100%;
+	height: auto;
+  max-height: 100%;
+	display: -webkit-box;
+	display: -ms-flexbox;
+	display: flex;
+  align-items: flex-start;
+  position: relative;
+}
+
 .prism-editor-wrapper {
   width: 100%;
   height: 100%;
-  display: flex;
-  align-items: flex-start;
+  display: block;
   overflow: auto;
   tab-size: 1.5em;
   -moz-tab-size: 1.5em;
+}
 
   @media all and (-ms-high-contrast: none), (-ms-high-contrast: active) {
     .prism-editor__textarea {
@@ -16,14 +28,31 @@
       color: transparent !important;
     }
   }
+  .prism-editor__autocomplete {
+    position: absolute;
+    min-width: 100px;
+    width: 100%;
+    max-width: 250px;
+    top: 25px;
+    min-height: 12px;
+    max-height: 180px;
+    overflow-y: auto;
+    z-index: 4;
+  }
+  .prism-editor__autocomplete li {
+    overflow: hidden;
+    white-space: nowrap;
+    padding: 1px 5px;
+    cursor: pointer;
+  }
 
   .prism-editor__container {
     position: relative;
     text-align: left;
     box-sizing: border-box;
     padding: 0;
-    overflow: hidden;
-    width: 100%;
+    width: max-content;
+    min-width: 100%;
   }
 
   .prism-editor__line-numbers {
@@ -84,5 +113,6 @@
   .prism-editor__editor {
     position: relative;
     pointer-events: none;
+    overflow: visible;
   }
-}
+

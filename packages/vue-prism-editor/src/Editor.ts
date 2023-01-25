@@ -7,11 +7,15 @@ const KEYCODE_BACKSPACE = 8;
 const KEYCODE_Y = 89;
 const KEYCODE_Z = 90;
 const KEYCODE_M = 77;
-const KEYCODE_PARENS = 57;
-const KEYCODE_BRACKETS = 219;
-const KEYCODE_QUOTE = 222;
-const KEYCODE_BACK_QUOTE = 192;
 const KEYCODE_ESCAPE = 27;
+
+const BRACKET_PAIRS: {[opening: string]: string} = {
+  '(':')',
+  '{':'}',
+  '[':']',
+  '"':'"',
+  "'":"'",
+};
 
 const HISTORY_LIMIT = 100;
 const HISTORY_TIME_GAP = 3000;
@@ -39,6 +43,11 @@ export interface Record {
 export interface History {
   stack: Array<Record & { timestamp: number }>;
   offset: number;
+}
+interface AutocompleteEntry {
+  text: string
+  overlap: number
+  label?: string
 }
 
 export const PrismEditor = Vue.extend({
@@ -79,6 +88,12 @@ export const PrismEditor = Vue.extend({
       type: String,
       default: '',
     },
+    autocomplete: {
+      type: Function,
+      default() {
+        return []
+      }
+    }
   },
   data() {
     return {
@@ -89,6 +104,10 @@ export const PrismEditor = Vue.extend({
       } as History,
       lineNumbersHeight: '20px',
       codeData: '',
+
+      autocompleteOpen: false,
+      autocompleteIndex: 0,
+      autocompleteData: [] as AutocompleteEntry[]
     };
   },
   watch: {
@@ -118,6 +137,12 @@ export const PrismEditor = Vue.extend({
         this.setLineNumbersHeight();
       });
     },
+    autocompleteIndex() {
+      Vue.nextTick(() => {
+        let node = this.$el.querySelector('ul.prism-editor__autocomplete > li.selected');
+        if (node) node.scrollIntoView({block: 'nearest'});
+      })
+    },
   },
   computed: {
     isEmpty(): boolean {
@@ -132,6 +157,19 @@ export const PrismEditor = Vue.extend({
       const totalLines = this.codeData.split(/\r\n|\n/).length;
       return totalLines;
     },
+    cursorOffset() {
+      let text: string = this.codeData;
+      let input = this.$refs.textarea as HTMLTextAreaElement;
+      let wrapper = this.$refs.wrapper as HTMLDivElement;
+      let lines = text.substring(0, input.selectionEnd || 0).split(/\r\n|\n/);
+      let font_size = parseFloat(getComputedStyle(input).getPropertyValue('font-size'));
+      let line = lines.length;
+      let column = lines[lines.length-1].length;
+      return [
+        Math.min((column * 8.85 * (font_size / 16))    - wrapper.scrollLeft, wrapper.clientWidth - Math.min(240, wrapper.clientWidth)),
+        (line * 24.0 * (font_size / 16)) + 2  - wrapper.scrollTop,
+      ]
+    },
   },
   mounted() {
     this._recordCurrentState();
@@ -139,6 +177,52 @@ export const PrismEditor = Vue.extend({
   },
 
   methods: {
+    updateAutocompleteData() {
+      let input = this.$refs.textarea as HTMLTextAreaElement;
+      let data: AutocompleteEntry[] = typeof this.autocomplete == 'function' ? this.autocomplete(this.codeData, input.selectionEnd) : [];
+      let old_length = this.autocompleteData.length;
+      this.autocompleteData.splice(0, Infinity, ...data);
+      this.autocompleteOpen = true;
+      this.autocompleteIndex = Math.max(0, Math.min(this.autocompleteIndex, this.autocompleteData.length-1));
+      if (old_length > this.autocompleteData.length) this.autocompleteIndex = 0;
+    },
+    acceptAutocomplete(event: Event, option?: number) {
+      event.preventDefault()
+      if (option == undefined) option = this.autocompleteIndex;
+
+      let input = this.$refs.textarea as HTMLTextAreaElement;
+      let wrapper = this.$refs.wrapper as HTMLDivElement;
+      let suggestion = this.autocompleteData[option] || this.autocompleteData[0];
+      if (!suggestion) return;
+      
+      let overlap = suggestion.overlap || 0;
+      let new_text = [
+        this.codeData.substr(0, input.selectionEnd - overlap),
+        suggestion.text,
+        this.codeData.substring(input.selectionEnd),
+      ]
+      let result: string = new_text.join('');
+      let cursor_pos = input.selectionEnd - overlap + suggestion.text.length + (suggestion.text.endsWith(')') ? -1 : 0);
+      input.selectionStart = input.selectionEnd = cursor_pos;
+
+      this._applyEdits({
+        value: result,
+        selectionStart: cursor_pos,
+        selectionEnd: cursor_pos,
+      });
+      let inserted_characters = suggestion.text.length - suggestion.overlap;
+      Vue.nextTick(() => {
+        wrapper.scrollLeft += inserted_characters * 8.85;
+      })
+
+      if (suggestion.text.endsWith('.')) {
+        setTimeout(() => {
+          this.updateAutocompleteData();
+        }, 1);
+      } else {
+        this.autocompleteOpen = false;
+      }
+    },
     setLineNumbersHeight(): void {
       this.lineNumbersHeight = getComputedStyle(this.$refs.pre as HTMLTextAreaElement).height;
     },
@@ -180,6 +264,15 @@ export const PrismEditor = Vue.extend({
     },
     _getLines(text: string, position: number): Array<string> {
       return text.substring(0, position).split('\n');
+    },
+    _recordStateIfChange(): void {
+      if (this.history.stack[this.history.offset].value != this.codeData) {
+        this._recordChange({
+          value: this.codeData,
+          selectionStart: this.codeData.length,
+          selectionEnd: this.codeData.length,
+        });
+      }
     },
     _applyEdits(record: Record): void {
       // Save last selection state
@@ -315,6 +408,35 @@ export const PrismEditor = Vue.extend({
         }
       }
 
+      if (e.keyCode === 9 && this.autocompleteData.length && this.autocompleteOpen) {
+        this.acceptAutocomplete(e);
+        e.preventDefault();
+        e.stopPropagation();
+        return;
+      }
+      if (e.keyCode === 27) {
+        // Escape
+        if (this.autocompleteData.length && this.autocompleteOpen) {
+          e.preventDefault();
+          this.autocompleteOpen = false;
+          return;
+        }
+      } else if (e.keyCode === 38) {
+        // Up
+        if (this.autocompleteData.length && this.autocompleteOpen) {
+          e.preventDefault();
+          this.autocompleteIndex = (this.autocompleteIndex ? this.autocompleteIndex : this.autocompleteData.length) - 1;
+          return;
+        }
+      } else if (e.keyCode === 40) {
+        // Down
+        if (this.autocompleteData.length && this.autocompleteOpen) {
+          e.preventDefault();
+          this.autocompleteIndex = (this.autocompleteIndex + 1) % this.autocompleteData.length;
+          return;
+        }
+      }
+
       if (e.keyCode === KEYCODE_ESCAPE) {
         (<HTMLTextAreaElement>e.target).blur();
         this.$emit('blur', e);
@@ -412,8 +534,11 @@ export const PrismEditor = Vue.extend({
           });
         }
       } else if (e.keyCode === KEYCODE_ENTER) {
-        // Ignore selections
-        if (selectionStart === selectionEnd) {
+        
+        if (this.autocompleteData.length && this.autocompleteOpen) {
+          this.acceptAutocomplete(e);
+
+        } else if (selectionStart === selectionEnd) {
           // Get the current line
           const line = this._getLines(value, selectionStart).pop();
           const matches = line?.match(/^\s+/);
@@ -434,48 +559,21 @@ export const PrismEditor = Vue.extend({
             });
           }
         }
-      } else if (
-        e.keyCode === KEYCODE_PARENS ||
-        e.keyCode === KEYCODE_BRACKETS ||
-        e.keyCode === KEYCODE_QUOTE ||
-        e.keyCode === KEYCODE_BACK_QUOTE
-      ) {
-        let chars;
-
-        if (e.keyCode === KEYCODE_PARENS && e.shiftKey) {
-          chars = ['(', ')'];
-        } else if (e.keyCode === KEYCODE_BRACKETS) {
-          if (e.shiftKey) {
-            chars = ['{', '}'];
-          } else {
-            chars = ['[', ']'];
-          }
-        } else if (e.keyCode === KEYCODE_QUOTE) {
-          if (e.shiftKey) {
-            chars = ['"', '"'];
-          } else {
-            chars = ["'", "'"];
-          }
-        } else if (e.keyCode === KEYCODE_BACK_QUOTE && !e.shiftKey) {
-          chars = ['`', '`'];
-        }
-
-        // console.log(isMacLike, "navigator" in global && /(Mac|iPhone|iPod|iPad)/i.test(navigator.platform));
-
+      } else if (BRACKET_PAIRS[e.key]) {
         // If text is selected, wrap them in the characters
-        if (selectionStart !== selectionEnd && chars) {
+        if (selectionStart !== selectionEnd) {
           e.preventDefault();
 
           this._applyEdits({
             value:
               value.substring(0, selectionStart) +
-              chars[0] +
+              e.key +
               value.substring(selectionStart, selectionEnd) +
-              chars[1] +
+              BRACKET_PAIRS[e.key] +
               value.substring(selectionEnd),
             // Update caret position
-            selectionStart,
-            selectionEnd: selectionEnd + 2,
+            selectionStart: selectionStart + 1,
+            selectionEnd: selectionEnd + 1,
           });
         }
       } else if (
@@ -510,6 +608,11 @@ export const PrismEditor = Vue.extend({
         // Toggle capturing tab key so users can focus away
         this.capture = !this.capture;
       }
+      if (e.keyCode !== 13 && e.keyCode !== 9) {
+        setTimeout(() => {
+          this.updateAutocompleteData();
+        }, 1);
+      }
     },
   },
   render(h): VNode {
@@ -542,21 +645,43 @@ export const PrismEditor = Vue.extend({
       ]
     );
 
+    const autocompleteList = (this.autocompleteOpen && this.autocompleteData.length) ? h(
+      'ul',
+      {
+        staticClass: 'prism-editor__autocomplete',
+        style: {left: this.cursorOffset[0] + 'px', top: this.cursorOffset[1] + 'px'}
+      },
+      this.autocompleteData.map((data: AutocompleteEntry, i) => {
+        return h('li', {
+          key: data.text,
+          class: {selected: i == this.autocompleteIndex},
+          on: {
+            mousedown: ($event: MouseEvent) => {
+              this.acceptAutocomplete($event, i);
+            }
+          }
+        }, [data.label || data.text]);
+      })
+    ) : undefined;
+
     const textarea = h('textarea', {
       ref: 'textarea',
       on: {
         input: this.handleChange,
         keydown: this.handleKeyDown,
         click: ($event: MouseEvent) => {
+          this.autocompleteOpen = false;
           this.$emit('click', $event);
         },
         keyup: ($event: KeyboardEvent) => {
           this.$emit('keyup', $event);
         },
         focus: ($event: FocusEvent) => {
+          this._recordStateIfChange();
           this.$emit('focus', $event);
         },
         blur: ($event: FocusEvent) => {
+          this.autocompleteOpen = false;
           this.$emit('blur', $event);
         },
       },
@@ -589,6 +714,7 @@ export const PrismEditor = Vue.extend({
       },
     });
     const editorContainer = h('div', { staticClass: 'prism-editor__container' }, [textarea, preview]);
-    return h('div', { staticClass: 'prism-editor-wrapper' }, [this.lineNumbers && lineNumbers, editorContainer]);
+    const wrapper = h('div', { staticClass: 'prism-editor-wrapper', ref: 'wrapper' }, [this.lineNumbers && lineNumbers, editorContainer]);
+    return h('div', { staticClass: 'prism-editor-component' }, [wrapper, autocompleteList]);
   },
 });

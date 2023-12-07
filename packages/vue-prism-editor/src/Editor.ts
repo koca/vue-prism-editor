@@ -90,6 +90,8 @@ export const PrismEditor = defineComponent({
       } as History,
       lineNumbersHeight: '20px',
       codeData: '',
+      lineIndexWraps: [] as number[],
+      componentKey: 0,
     };
   },
   watch: {
@@ -109,6 +111,7 @@ export const PrismEditor = defineComponent({
         if (this.lineNumbers) {
           this.$nextTick(() => {
             this.setLineNumbersHeight();
+            this.setLineNumbersWrap();
           });
         }
       },
@@ -117,6 +120,7 @@ export const PrismEditor = defineComponent({
       this.$nextTick(() => {
         this.styleLineNumbers();
         this.setLineNumbersHeight();
+        this.setLineNumbersWrap();
       });
     },
   },
@@ -137,6 +141,7 @@ export const PrismEditor = defineComponent({
   mounted() {
     this._recordCurrentState();
     this.styleLineNumbers();
+    window.addEventListener('resize', this.setLineNumbersWrap);
   },
 
   methods: {
@@ -165,6 +170,19 @@ export const PrismEditor = defineComponent({
         });
         $lineNumbers.style['margin-bottom' as any] = '-' + editorStyles['padding-top' as any];
       });
+    },
+    setLineNumbersWrap(): void {
+      const editor = this.$refs.pre as HTMLTextAreaElement;
+      const codeData = this.codeData.split(/\r\n|\n/);
+      codeData.forEach((line, index) => {
+        const lineWidth = line.length;
+        const editorWidth = editor.clientWidth / 8;
+        const wraps = Math.ceil(lineWidth / editorWidth) - 1; // Calculate number of wraps
+        this.lineIndexWraps[index] = wraps;
+      });
+    },
+    forceUpdate(): void {
+      this.componentKey += 1;
     },
     _recordCurrentState(): void {
       const input = this.$refs.textarea as HTMLTextAreaElement;
@@ -532,7 +550,17 @@ export const PrismEditor = defineComponent({
       [
         lineNumberWidthCalculator,
         Array.from(Array(this.lineNumbersCount).keys()).map((_, index) => {
-          return h('div', { class: 'prism-editor__line-number token comment' }, `${++index}`);
+          const lineWraps = this.lineIndexWraps[index];
+          const value = index + 1;
+          if (lineWraps > 0) {
+            const wraps: any[] = [];
+            for (let i = 0; i < lineWraps; i++) {
+              wraps[i] = h('div', { class: 'prism-editor__line-number token comment' }, `${value}`);
+            }
+            return h('div', { class: 'prism-editor__line-number token comment' }, [`${value}`, wraps]);
+          } else {
+            return h('div', { class: 'prism-editor__line-number token comment' }, `${value}`);
+          }
         }),
       ]
     );
